@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מערכת ניהול משלוחים - האב עסקי</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (עיצוב) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,11 +24,11 @@
         }
     </script>
     
-    <!-- React & ReactDOM -->
+    <!-- React & ReactDOM (מנוע האפליקציה) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
-    <!-- Babel -->
+    <!-- Babel (תרגום הקוד לדפדפן) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
@@ -163,6 +163,10 @@
             Globe: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>} />,
             Moon: (props) => <Icon {...props} path={<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>} />,
             Sun: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></>} />,
+            Helmet: (props) => <Icon {...props} path={<><path d="M12 4a8 8 0 0 0-8 8v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a8 8 0 0 0-8-8z"/><path d="M4 13h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z"/></>} />,
+            Upload: (props) => <Icon {...props} path={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></>} />,
+            Menu: (props) => <Icon {...props} path={<><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></>} />,
+            X: (props) => <Icon {...props} path={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>} />,
             // CUSTOM APP LOGO ICON WRAPPER
             CustomAppLogo: (props) => (
                 <svg viewBox="0 0 624 624" fill="none" xmlns="http://www.w3.org/2000/svg" className={props.className}>
@@ -301,34 +305,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                </div>
-            );
-        };
-        
-        // --- 6. INVOICES HISTORY COMPONENT ---
-        const InvoicesHistory = ({ onBack }) => {
-            const invoices = [
-                { id: 1, date: '20/01/2026', amount: 3500, desc: 'רכישת חבילת משלוחים (10,000 יח\')', number: 'INV-2026-001', status: 'שולם' },
-                { id: 2, date: '15/12/2025', amount: 1500, desc: 'רכישת חבילת משלוחים (3,000 יח\')', number: 'INV-2025-089', status: 'שולם' },
-                { id: 3, date: '01/11/2025', amount: 4500, desc: 'רכישת חבילת משלוחים (15,000 יח\')', number: 'INV-2025-052', status: 'שולם' },
-            ];
-            const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
-
-            return (
-                <div className="space-y-6 animate-in slide-in-from-right duration-500 p-8 max-w-7xl mx-auto">
-                    {/* Back Button */}
-                    <button 
-                        onClick={onBack}
-                        className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors font-medium mb-4"
-                    >
-                        <Icons.ArrowRight className="w-4 h-4" />
-                        חזרה לכספים
-                    </button>
-
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"><div className="flex items-center gap-3"><div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Icons.FileText className="w-5 h-5" /></div><div><h3 className="font-bold text-slate-800 text-lg">היסטוריית רכישות</h3><p className="text-sm text-gray-500">צפייה והורדה של חשבוניות מס עבור רכישות יתרה</p></div></div></div>
-                        <div className="overflow-x-auto"><table className="w-full text-right"><thead className="bg-gray-50 text-gray-500 text-sm font-semibold uppercase tracking-wider"><tr><th className="px-6 py-4">תאריך</th><th className="px-6 py-4">מספר חשבונית</th><th className="px-6 py-4">תיאור</th><th className="px-6 py-4">סכום</th><th className="px-6 py-4">סטטוס</th><th className="px-6 py-4">פעולות</th></tr></thead><tbody className="divide-y divide-gray-100 text-sm text-slate-700">{invoices.map((inv) => (<tr key={inv.id} className="hover:bg-slate-50 transition-colors"><td className="px-6 py-4 font-medium">{inv.date}</td><td className="px-6 py-4 font-mono text-gray-500">{inv.number}</td><td className="px-6 py-4">{inv.desc}</td><td className="px-6 py-4 font-bold">{formatCurrency(inv.amount)}</td><td className="px-6 py-4"><span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-semibold">{inv.status}</span></td><td className="px-6 py-4"><button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all font-medium"><Icons.Download className="w-4 h-4" />הורד</button></td></tr>))}</tbody></table></div>
                     </div>
                 </div>
             );
@@ -549,146 +525,7 @@
             </div>
         );
 
-        // --- LAYOUT ---
-
-        const Sidebar = ({ active, navigate }) => {
-            const menu = [
-                { id: 'dashboard', icon: Icons.LayoutDashboard, tooltip: 'דשבורד' },
-                { id: 'live', icon: Icons.Activity, tooltip: 'מנג׳ר לייב' },
-                { divider: true },
-                { id: 'entities', icon: Icons.Users, tooltip: 'ניהול ישויות' }, // Grouped
-                { id: 'data', icon: Icons.BarChart, tooltip: 'מרכז נתונים' }, // Grouped
-                { id: 'finance', icon: Icons.CreditCard, tooltip: 'כספים' }, // Grouped
-                { divider: true },
-                { id: 'settings', icon: Icons.Settings, tooltip: 'הגדרות' },
-            ];
-
-            return (
-                <div className="w-20 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 flex flex-col items-center py-6 z-20 shadow-sm transition-colors duration-300">
-                    <div className="mb-8 p-3 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-600/30 overflow-hidden w-12 h-12 flex items-center justify-center">
-                        {/* CUSTOM APP LOGO - Static */}
-                        <Icons.CustomAppLogo className="w-8 h-8" />
-                    </div>
-                    
-                    <div className="flex-1 w-full space-y-3 px-3 overflow-y-auto no-scrollbar">
-                        {menu.map((item, idx) => (
-                            item.divider ? 
-                            <div key={idx} className="h-px bg-gray-200 dark:bg-slate-700 w-full my-2"></div> :
-                            <button 
-                                key={item.id}
-                                onClick={() => navigate(item.id)}
-                                className={`w-full aspect-square flex items-center justify-center rounded-xl transition-all duration-200 group relative ${
-                                    active === item.id 
-                                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
-                                    : 'text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
-                                }`}
-                            >
-                                <item.icon className="w-6 h-6" />
-                                {/* Tooltip */}
-                                <div className="absolute right-full mr-4 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                                    {item.tooltip}
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="mt-4 px-3 w-full">
-                        <button className="w-full aspect-square flex items-center justify-center rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
-                            <Icons.LogOut className="w-6 h-6" />
-                        </button>
-                    </div>
-                </div>
-            );
-        };
-
-        const TopBar = ({ title, balance, onBalanceClick, isDark, toggleDark }) => (
-            <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 transition-colors duration-300">
-                <h1 className="text-xl font-bold text-slate-800 dark:text-white">{title}</h1>
-                
-                <div className="flex items-center gap-6">
-
-                    <button 
-                        onClick={onBalanceClick}
-                        className="text-right hover:bg-gray-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg transition-colors group cursor-pointer"
-                    >
-                        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 transition-colors">[שם העסק]</p>
-                        <div className="flex items-center justify-end gap-1 mt-0.5">
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 rounded-md">
-                                {new Intl.NumberFormat('he-IL').format(balance)}
-                            </span>
-                            <span className="text-[10px] text-gray-400 dark:text-slate-500">משלוחים</span>
-                        </div>
-                    </button>
-                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700">א</div>
-                </div>
-            </header>
-        );
-
-        // --- SUB-NAVIGATION COMPONENT (TABS) ---
-        const Tabs = ({ tabs, active, onChange }) => {
-            const labels = {
-                'restaurants': 'מסעדות',
-                'couriers': 'שליחים',
-                'managers': 'מנהלים',
-                'orders': 'הזמנות',
-                'reports': 'דוחות',
-                'performance': 'ביצועים',
-                'purchase': 'רכישת יתרה',
-                'pricing': 'תמחור',
-                'zones': 'אזורי משלוח',
-                'payouts': 'תשלומים' // Updated Label
-            };
-
-            return (
-                <div className="flex gap-2 border-b border-gray-200 dark:border-slate-700 mb-6">
-                    {tabs.map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => onChange(tab)}
-                            className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                                active === tab
-                                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
-                            }`}
-                        >
-                            {labels[tab] || tab}
-                        </button>
-                    ))}
-                </div>
-            );
-        };
-
-        // --- PAGE WRAPPERS FOR GROUPED CONTENT ---
-        
-        const EntitiesPage = () => {
-            const [tab, setTab] = useState('restaurants');
-            return (
-                <div className="p-8 h-full flex flex-col">
-                    <Tabs tabs={['restaurants', 'couriers', 'managers']} active={tab} onChange={setTab} />
-                    <div className="flex-1 overflow-y-auto">
-                        {tab === 'restaurants' && <ConstructionPage title="ניהול מסעדות" icon={Icons.Utensils} />}
-                        {tab === 'couriers' && <ConstructionPage title="ניהול שליחים" icon={Icons.Truck} />}
-                        {tab === 'managers' && <ConstructionPage title="ניהול מנהלים" icon={Icons.Briefcase} />}
-                    </div>
-                </div>
-            );
-        };
-
-        const DataPage = () => {
-            const [tab, setTab] = useState('orders');
-            return (
-                <div className="p-8 h-full flex flex-col">
-                    <Tabs tabs={['orders', 'reports', 'performance']} active={tab} onChange={setTab} />
-                    <div className="flex-1 overflow-y-auto">
-                        {tab === 'orders' && <ConstructionPage title="היסטוריית הזמנות" icon={Icons.ClipboardList} />}
-                        {tab === 'reports' && <ConstructionPage title="דוחות" icon={Icons.BarChart} />}
-                        {tab === 'performance' && <ConstructionPage title="ביצועים" icon={Icons.TrendingUp} />}
-                    </div>
-                </div>
-            );
-        };
-
-        // NEW: Payouts Page Component (Monthly Balance View)
+        // --- NEW: Payouts Page Component (Monthly Balance View) ---
         const PayoutsPage = () => {
              // Mock data for current month
              const currentMonth = "ינואר 2026";
@@ -904,6 +741,195 @@
             );
         };
 
+        // --- INVOICES HISTORY COMPONENT ---
+        const InvoicesHistory = ({ onBack }) => {
+            const invoices = [
+                { id: 1, date: '20/01/2026', amount: 3500, desc: 'רכישת חבילת משלוחים (10,000 יח\')', number: 'INV-2026-001', status: 'שולם' },
+                { id: 2, date: '15/12/2025', amount: 1500, desc: 'רכישת חבילת משלוחים (3,000 יח\')', number: 'INV-2025-089', status: 'שולם' },
+                { id: 3, date: '01/11/2025', amount: 4500, desc: 'רכישת חבילת משלוחים (15,000 יח\')', number: 'INV-2025-052', status: 'שולם' },
+            ];
+            const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
+
+            return (
+                <div className="space-y-6 animate-in slide-in-from-right duration-500 p-8 max-w-7xl mx-auto">
+                    {/* Back Button */}
+                    <button 
+                        onClick={onBack}
+                        className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors font-medium mb-4"
+                    >
+                        <Icons.ArrowRight className="w-4 h-4" />
+                        חזרה לכספים
+                    </button>
+
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"><div className="flex items-center gap-3"><div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Icons.FileText className="w-5 h-5" /></div><div><h3 className="font-bold text-slate-800 text-lg">היסטוריית רכישות</h3><p className="text-sm text-gray-500">צפייה והורדה של חשבוניות מס עבור רכישות יתרה</p></div></div></div>
+                        <div className="overflow-x-auto"><table className="w-full text-right"><thead className="bg-gray-50 text-gray-500 text-sm font-semibold uppercase tracking-wider"><tr><th className="px-6 py-4">תאריך</th><th className="px-6 py-4">מספר חשבונית</th><th className="px-6 py-4">תיאור</th><th className="px-6 py-4">סכום</th><th className="px-6 py-4">סטטוס</th><th className="px-6 py-4">פעולות</th></tr></thead><tbody className="divide-y divide-gray-100 text-sm text-slate-700">{invoices.map((inv) => (<tr key={inv.id} className="hover:bg-slate-50 transition-colors"><td className="px-6 py-4 font-medium">{inv.date}</td><td className="px-6 py-4 font-mono text-gray-500">{inv.number}</td><td className="px-6 py-4">{inv.desc}</td><td className="px-6 py-4 font-bold">{formatCurrency(inv.amount)}</td><td className="px-6 py-4"><span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-semibold">{inv.status}</span></td><td className="px-6 py-4"><button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all font-medium"><Icons.Download className="w-4 h-4" />הורד</button></td></tr>))}</tbody></table></div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- GLOBAL LAYOUT COMPONENTS ---
+
+        const Sidebar = ({ active, navigate }) => {
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+            // Handle resize to close mobile menu on desktop
+            useEffect(() => {
+                const handleResize = () => {
+                    if (window.innerWidth >= 768) {
+                        setIsMobileMenuOpen(false);
+                    }
+                };
+                window.addEventListener('resize', handleResize);
+                return () => window.removeEventListener('resize', handleResize);
+            }, []);
+
+            const menu = [
+                { id: 'dashboard', icon: Icons.LayoutDashboard, tooltip: 'דשבורד', label: 'דשבורד' },
+                { id: 'live', icon: Icons.Activity, tooltip: 'מנג׳ר לייב', label: 'מנג׳ר לייב' },
+                { divider: true },
+                { id: 'entities', icon: Icons.Users, tooltip: 'ניהול ישויות', label: 'ניהול ישויות' }, // Grouped
+                { id: 'data', icon: Icons.BarChart, tooltip: 'מרכז נתונים', label: 'מרכז נתונים' }, // Grouped
+                { id: 'finance', icon: Icons.CreditCard, tooltip: 'כספים', label: 'כספים' }, // Grouped
+                { divider: true },
+                { id: 'settings', icon: Icons.Settings, tooltip: 'הגדרות', label: 'הגדרות' },
+            ];
+
+            const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+            const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+            // Function to handle navigation and close mobile menu
+            const handleNav = (id) => {
+                navigate(id);
+                closeMobileMenu();
+            }
+
+            return (
+                <>
+                {/* Mobile Menu Button (Hamburger) - Absolute positioned in TopBar logic usually, but here fixed for simplicity or passed via props? 
+                    Actually, let's keep the sidebar structure. The sidebar is hidden on mobile by default.
+                    We need a mobile header or button to toggle it. 
+                    Let's add the toggle button to the TopBar and pass the state down? 
+                    OR, let's make the Sidebar component handle the mobile drawer itself.
+                */}
+                
+                {/* Desktop Sidebar (Hidden on Mobile) */}
+                <div className="hidden md:flex w-20 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 flex-col items-center py-6 z-20 shadow-sm transition-colors duration-300">
+                    <div className="mb-8 p-3 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-600/30 overflow-hidden w-12 h-12 flex items-center justify-center">
+                        <Icons.CustomAppLogo className="w-8 h-8" />
+                    </div>
+                    
+                    <div className="flex-1 w-full space-y-3 px-3 overflow-y-auto no-scrollbar">
+                        {menu.map((item, idx) => (
+                            item.divider ? 
+                            <div key={idx} className="h-px bg-gray-200 dark:bg-slate-700 w-full my-2"></div> :
+                            <button 
+                                key={item.id}
+                                onClick={() => handleNav(item.id)}
+                                className={`w-full aspect-square flex items-center justify-center rounded-xl transition-all duration-200 group relative ${
+                                    active === item.id 
+                                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                                    : 'text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
+                                }`}
+                            >
+                                <item.icon className="w-6 h-6" />
+                                <div className="absolute right-full mr-4 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                    {item.tooltip}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="mt-4 px-3 w-full">
+                        <button className="w-full aspect-square flex items-center justify-center rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
+                            <Icons.LogOut className="w-6 h-6" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Drawer */}
+                {isMobileMenuOpen && (
+                    <div className="fixed inset-0 z-50 flex justify-end md:hidden">
+                        <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={closeMobileMenu}></div>
+                        <div className="relative w-64 bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col transition-transform transform translate-x-0">
+                            <div className="h-20 flex items-center justify-between px-6 border-b border-gray-100 dark:border-slate-800">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-blue-600 rounded-xl text-white flex items-center justify-center shadow-lg shadow-blue-600/30">
+                                        <Icons.CustomAppLogo className="w-6 h-6" />
+                                    </div>
+                                    <span className="font-bold text-lg text-slate-900 dark:text-white">ShipmentApp</span>
+                                </div>
+                                <button onClick={closeMobileMenu} className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white">
+                                    <Icons.X className="w-6 h-6" />
+                                </button>
+                            </div>
+                            
+                            <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                                {menu.map((item, idx) => (
+                                    item.divider ? 
+                                    <div key={idx} className="h-px bg-gray-200 dark:bg-slate-700 w-full my-2"></div> :
+                                    <button 
+                                        key={item.id}
+                                        onClick={() => handleNav(item.id)}
+                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                                            active === item.id 
+                                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                                            : 'text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
+                                        }`}
+                                    >
+                                        <item.icon className="w-5 h-5" />
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </div>
+                             <div className="p-4 border-t border-gray-100 dark:border-slate-800">
+                                <button className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                    <Icons.LogOut className="w-5 h-5" />
+                                    התנתק
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
+                {/* Mobile Menu Toggle Button (Portal to TopBar) - Logic handled in App/TopBar */}
+                <div id="mobile-menu-trigger" className="hidden" onClick={toggleMobileMenu}></div>
+                </>
+            );
+        };
+
+        const TopBar = ({ title, balance, onBalanceClick, isDark, toggleDark }) => (
+            <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 flex-shrink-0 transition-colors duration-300">
+                <div className="flex items-center gap-4">
+                     {/* Mobile Hamburger */}
+                    <button 
+                        className="md:hidden text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
+                        onClick={() => document.getElementById('mobile-menu-trigger').click()}
+                    >
+                        <Icons.Menu className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-xl font-bold text-slate-800 dark:text-white truncate max-w-[150px] md:max-w-none">{title}</h1>
+                </div>
+                
+                <div className="flex items-center gap-3 md:gap-6">
+
+                    <button 
+                        onClick={onBalanceClick}
+                        className="text-right hover:bg-gray-50 dark:hover:bg-slate-800 px-2 md:px-3 py-1.5 rounded-lg transition-colors group cursor-pointer flex flex-col items-end"
+                    >
+                        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 transition-colors hidden md:block">[שם העסק]</p>
+                        <div className="flex items-center justify-end gap-1 mt-0.5">
+                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 rounded-md">
+                                {new Intl.NumberFormat('he-IL').format(balance)}
+                            </span>
+                            <span className="text-[10px] text-gray-400 dark:text-slate-500 hidden md:inline">משלוחים</span>
+                        </div>
+                    </button>
+                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700">א</div>
+                </div>
+            </header>
+        );
 
         // --- APP ---
         const App = () => {
@@ -939,17 +965,19 @@
             };
 
             return (
-                <div className={`flex w-full h-full bg-gray-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300`}>
+                <div className={`flex w-full h-full bg-gray-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 overflow-hidden`}>
                     <Sidebar active={section} navigate={setSection} />
                     
-                    <div className="flex-1 flex flex-col h-full overflow-hidden">
+                    <div className="flex-1 flex flex-col h-full overflow-hidden w-full">
                         <TopBar 
                             title={getTitle()} 
                             balance={10442} 
                             onBalanceClick={() => setSection('finance')} 
+                            isDark={isDark}
+                            toggleDark={() => setIsDark(!isDark)}
                         />
                         
-                        <div className="flex-1 overflow-y-auto p-0 scroll-smooth">
+                        <div className="flex-1 overflow-y-auto p-0 scroll-smooth w-full">
                             {section === 'dashboard' && <Dashboard />}
                             {section === 'live' && <ConstructionPage title="ניהול משלוחים לייב" icon={Icons.Activity} />}
                             {section === 'entities' && <EntitiesPage />}
