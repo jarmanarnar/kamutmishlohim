@@ -3,10 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול משלוחים - האב עסקי</title>
+    <title>מערכת ניהול משלוחים - האב עסקי</title>
     
     <!-- Tailwind CSS (עיצוב) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b', 
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- React & ReactDOM (מנוע האפליקציה) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -19,7 +35,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap');
         body { font-family: 'Assistant', sans-serif; }
         
-        /* Custom styles for inputs */
         .input-field {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -29,84 +44,263 @@
             transition: all 0.2s;
             outline: none;
         }
+        .dark .input-field {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: white;
+        }
         .input-field:focus {
             background-color: white;
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px #dbeafe;
         }
+        .dark .input-field:focus {
+            background-color: #0f172a;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
         .dir-ltr { direction: ltr; }
         
         /* Slider Styling */
-        input[type=range] {
-            -webkit-appearance: none; 
-            background: transparent; 
-        }
+        input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: #2563eb;
-            cursor: pointer;
-            margin-top: -8px; 
+            -webkit-appearance: none; height: 24px; width: 24px;
+            border-radius: 50%; background: #2563eb; cursor: pointer; margin-top: -8px; 
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            background: #e2e8f0;
-            border-radius: 4px;
+            width: 100%; height: 8px; cursor: pointer; background: #e2e8f0; border-radius: 4px;
+        }
+        .dark input[type=range]::-webkit-slider-runnable-track {
+            background: #334155;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Hide scrollbar for clean menu (but keep functionality) */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* Hide Number Spinners */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-slate-800">
+<body class="bg-gray-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 h-screen overflow-hidden flex">
 
-    <div id="root"></div>
+    <div id="root" class="w-full h-full"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- ICONS (SVG DEFINITIONS) ---
-        // הגדרת האייקונים ידנית כדי שלא תצטרך ספריות חיצוניות מסובכות
+        // --- ICONS ---
         const Icon = ({ path, className }) => (
-            <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                className={className}
-            >
-                {path}
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{path}</svg>
         );
 
         const Icons = {
+            LayoutDashboard: (props) => <Icon {...props} path={<><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></>} />,
             Package: (props) => <Icon {...props} path={<><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22v-10"/></>} />,
             TrendingUp: (props) => <Icon {...props} path={<><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></>} />,
-            CheckCircle2: (props) => <Icon {...props} path={<><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></>} />,
             ShoppingCart: (props) => <Icon {...props} path={<><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></>} />,
-            Minus: (props) => <Icon {...props} path={<path d="M5 12h14"/>} />,
+            Settings: (props) => <Icon {...props} path={<><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></>} />,
+            LogOut: (props) => <Icon {...props} path={<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></>} />,
+            Search: (props) => <Icon {...props} path={<><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></>} />,
             Plus: (props) => <Icon {...props} path={<path d="M12 5v14M5 12h14"/>} />,
-            CreditCard: (props) => <Icon {...props} path={<><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></>} />,
-            ChevronLeft: (props) => <Icon {...props} path={<path d="m15 18-6-6 6-6"/>} />,
-            ArrowRight: (props) => <Icon {...props} path={<path d="M5 12h14M12 5l7 7-7 7"/>} />,
+            Truck: (props) => <Icon {...props} path={<><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><path d="M15 18H9"/><circle cx="17" cy="18" r="2"/></>} />,
+            MapPin: (props) => <Icon {...props} path={<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>} />,
             AlertCircle: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></>} />,
+            CheckCircle2: (props) => <Icon {...props} path={<><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></>} />,
+            ChevronLeft: (props) => <Icon {...props} path={<path d="m15 18-6-6 6-6"/>} />,
+            CreditCard: (props) => <Icon {...props} path={<><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></>} />,
+            Minus: (props) => <Icon {...props} path={<path d="M5 12h14"/>} />,
+            ArrowRight: (props) => <Icon {...props} path={<path d="M5 12h14M12 5l7 7-7 7"/>} />,
             Building2: (props) => <Icon {...props} path={<><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></>} />,
             ShieldCheck: (props) => <Icon {...props} path={<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></>} />,
-            User: (props) => <Icon {...props} path={<><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>} />,
-            Lock: (props) => <Icon {...props} path={<><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>} />,
             Calendar: (props) => <Icon {...props} path={<><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></>} />,
-            Edit2: (props) => <Icon {...props} path={<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>} />
+            Lock: (props) => <Icon {...props} path={<><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>} />,
+            FileText: (props) => <Icon {...props} path={<><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></>} />,
+            Download: (props) => <Icon {...props} path={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></>} />,
+            History: (props) => <Icon {...props} path={<><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></>} />,
+            Map: (props) => <Icon {...props} path={<><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></>} />,
+            Tag: (props) => <Icon {...props} path={<><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></>} />,
+            Ruler: (props) => <Icon {...props} path={<><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></>} />,
+            Edit2: (props) => <Icon {...props} path={<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>} />,
+            Users: (props) => <Icon {...props} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>} />,
+            Clock: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>} />,
+            User: (props) => <Icon {...props} path={<><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>} />,
+            XCircle: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></>} />,
+            Activity: (props) => <Icon {...props} path={<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />} />,
+            Utensils: (props) => <Icon {...props} path={<><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></>} />,
+            Briefcase: (props) => <Icon {...props} path={<><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></>} />,
+            ClipboardList: (props) => <Icon {...props} path={<><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></>} />,
+            BarChart: (props) => <Icon {...props} path={<><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></>} />,
+            Globe: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>} />,
+            Moon: (props) => <Icon {...props} path={<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>} />,
+            Sun: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></>} />,
+            Helmet: (props) => <Icon {...props} path={<><path d="M12 4a8 8 0 0 0-8 8v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a8 8 0 0 0-8-8z"/><path d="M4 13h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z"/></>} />,
+            Upload: (props) => <Icon {...props} path={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></>} />,
+            // CUSTOM APP LOGO ICON WRAPPER
+            CustomAppLogo: (props) => (
+                <svg viewBox="0 0 624 624" fill="none" xmlns="http://www.w3.org/2000/svg" className={props.className}>
+                    <path d="M489.206 516.351H378.68C363.621 516.022 348.679 518.956 334.834 524.982C320.33 530.468 310.644 544.493 310.489 560.255C308.293 587.516 288.701 610.041 262.407 615.553C252.075 618.461 241.381 619.869 230.649 619.711H49.1932C27.9094 622.54 8.40775 607.265 5.63103 585.582C5.33398 583.267 5.24358 580.925 5.3469 578.583C4.62366 569.886 5.0886 561.124 6.70297 552.545C9.32471 529.074 29.8724 512.023 52.9773 514.193L163.207 515.43C196.476 515.43 229.732 515.43 263.001 516.667C272.584 516.956 282.024 514.259 290.07 508.97C300.338 502.615 309.081 493.971 315.629 483.709C319.839 476.947 322.345 469.21 322.887 461.224C323.959 443.91 334.059 428.516 349.35 420.872C362.33 413.899 376.859 410.452 391.543 410.86H612.609C618.356 410.86 621.081 412.241 619.867 418.412C619.712 419.846 619.712 421.293 619.867 422.727C619.867 427.503 618.059 428.74 613.668 428.74H553.187C548.796 428.74 543.062 427.661 542.907 434.279C542.752 440.897 548.654 439.976 553.032 439.976H612.002C617.594 439.976 620.164 441.515 619.105 447.37C618.886 448.804 618.886 450.251 619.105 451.686C619.105 456.461 617.142 458.159 612.454 458.159H551.973C550.165 458.001 548.344 458.001 546.536 458.159C543.979 458.317 541.99 460.487 542.003 463.093C541.538 465.684 543.243 468.171 545.787 468.631C547.995 468.868 550.23 468.868 552.438 468.631H612.919C618.214 468.631 619.57 470.473 618.963 475.565C617.607 487.735 618.963 486.354 607.469 486.354H547.143C543.217 486.354 539.588 486.354 539.588 491.893C539.588 497.432 543.217 498.05 547.453 498.05H608.838C614.882 498.05 616.703 499.892 616.251 505.905C615.192 516.075 616.251 516.075 605.816 516.075H489.232V516.377L489.206 516.351Z" fill="currentColor"/>
+                    <path d="M225.792 17.1167C250.408 8.39375 276.407 4.43411 302.456 5.40771C400.145 12.4993 466.527 71.1782 480.889 170.696L480.876 170.683C486.765 214.1 483.937 258.281 472.559 300.541C470.893 307.316 469.834 314.25 468.168 321.183C467.974 322.262 467.612 323.302 467.109 324.262C463.324 333.511 430.056 328.578 419.776 328.578H393.622C379.041 327.749 364.409 328.775 350.073 331.657C330.572 334.933 314.364 348.734 307.738 367.706C306.602 371.613 305.942 375.64 305.775 379.718C300.621 408.571 277.762 430.74 249.22 434.555H196.152C145.5 434.871 94.6923 434.556 43.8849 433.174C39.6619 433.056 35.4648 432.542 31.3322 431.634C30.1052 431.384 28.8904 431.069 27.7023 430.687C10.6678 425.161 1.26555 406.61 6.68958 389.27C11.6748 361.233 17.2669 333.353 23.1691 306.092C30.8793 268.806 38.745 231.993 48.1212 195.641C57.6783 158.723 76.4957 124.963 102.713 97.6763C136.253 60.4821 178.64 32.7338 225.792 17.1167ZM275.442 125.962C274.318 125.844 273.194 125.87 272.07 126.015L131.904 144.198C106.772 147.29 85.4233 164.394 76.5636 188.563C58.2115 236.901 47.1948 287.805 43.9015 339.524L43.9044 339.907C44.0326 343.976 47.2736 347.275 51.3146 347.365C52.2445 347.378 53.1619 347.234 54.0402 346.905C94.4125 331.498 240.326 269.885 265.73 216.745C277.663 193.668 285.541 168.643 289.015 142.803C289.828 134.33 283.759 126.804 275.442 125.962Z" fill="currentColor"/>
+                </svg>
+        )
         };
 
-        // --- COMPONENTS ---
+        // --- CONSTANTS ---
+        const CURRENT_BALANCE = 10442;
 
-        // 1. SHIPMENT HUB (The Selection Page)
-        const ShipmentHub = ({ onCheckout }) => {
+        // --- 1. DASHBOARD ---
+        const Dashboard = () => {
+            return (
+                <div className="p-8 space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">לוח בקרה ראשי</h1>
+                        <p className="text-gray-500 dark:text-slate-400 text-sm">סקירה כללית בזמן אמת</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-blue-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                            <div className="absolute right-0 top-0 w-1 h-full bg-blue-500"></div>
+                            <div className="flex justify-between items-start">
+                                <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">פעילים</span>
+                                <div className="p-2 bg-blue-50 dark:bg-slate-700 rounded-lg text-blue-600 dark:text-blue-400"><Icons.Package className="w-5 h-5"/></div>
+                            </div>
+                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">42</div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-orange-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                            <div className="absolute right-0 top-0 w-1 h-full bg-orange-500"></div>
+                            <div className="flex justify-between items-start">
+                                <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">ממתינים</span>
+                                <div className="p-2 bg-orange-50 dark:bg-slate-700 rounded-lg text-orange-600 dark:text-orange-400"><Icons.Clock className="w-5 h-5"/></div>
+                            </div>
+                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">15</div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-purple-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                            <div className="absolute right-0 top-0 w-1 h-full bg-purple-500"></div>
+                            <div className="flex justify-between items-start">
+                                <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">שובץ</span>
+                                <div className="p-2 bg-purple-50 dark:bg-slate-700 rounded-lg text-purple-600 dark:text-purple-400"><Icons.User className="w-5 h-5"/></div>
+                            </div>
+                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">8</div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-indigo-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                            <div className="absolute right-0 top-0 w-1 h-full bg-indigo-500"></div>
+                            <div className="flex justify-between items-start">
+                                <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">נאסף</span>
+                                <div className="p-2 bg-indigo-50 dark:bg-slate-700 rounded-lg text-indigo-600 dark:text-indigo-400"><Icons.Truck className="w-5 h-5"/></div>
+                            </div>
+                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">19</div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6">
+                            <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><Icons.Users className="w-5 h-5 text-gray-400" /> מצב שליחים</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 text-center">
+                                    <span className="block text-gray-500 dark:text-slate-400 text-xs font-bold uppercase mb-1">שליחים פעילים</span>
+                                    <span className="text-3xl font-black text-slate-800 dark:text-white">12</span>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 text-center">
+                                    <span className="block text-gray-500 dark:text-slate-400 text-xs font-bold uppercase mb-1">מצוותים</span>
+                                    <span className="text-3xl font-black text-blue-600">8</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6">
+                            <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><Icons.Calendar className="w-5 h-5 text-gray-400" /> ביצועים היום</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-emerald-50 dark:bg-slate-900/50 rounded-xl p-4 text-center border border-emerald-100 dark:border-emerald-900/30">
+                                    <span className="block text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase mb-1">נמסרו</span>
+                                    <span className="text-3xl font-black text-emerald-700 dark:text-emerald-500">38</span>
+                                </div>
+                                <div className="bg-red-50 dark:bg-slate-900/50 rounded-xl p-4 text-center border border-red-100 dark:border-red-900/30">
+                                    <span className="block text-red-600 dark:text-red-400 text-xs font-bold uppercase mb-1">בוטלו</span>
+                                    <span className="text-3xl font-black text-red-700 dark:text-red-500">2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- COMPONENTS UNDER CONSTRUCTION / PLACEHOLDERS ---
+        const ConstructionPage = ({ title, icon: IconComponent }) => (
+            <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-in fade-in">
+                <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-6">
+                    <IconComponent className="w-12 h-12 text-slate-400 dark:text-slate-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">{title}</h2>
+                <p className="text-slate-500 dark:text-slate-400 max-w-md">מודול זה נמצא כרגע בפיתוח ויעלה לאוויר בקרוב.</p>
+            </div>
+        );
+
+        // --- SETTINGS PAGE (With Dark Mode & Language) ---
+        const SettingsPage = ({ isDark, toggleDark }) => {
+            return (
+                <div className="p-8 space-y-8 animate-in fade-in max-w-4xl mx-auto">
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">הגדרות מערכת</h1>
+                    
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div className="p-6 border-b border-gray-100 dark:border-slate-700">
+                            <h3 className="font-bold text-slate-800 dark:text-white mb-1">תצוגה ושפה</h3>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">התאמה אישית של ממשק המשתמש</p>
+                        </div>
+                        <div className="p-6 space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-slate-100 dark:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300"><Icons.Moon className="w-5 h-5" /></div>
+                                    <div>
+                                        <div className="font-medium text-slate-800 dark:text-white">מצב כהה</div>
+                                        <div className="text-xs text-gray-500 dark:text-slate-400">ערכת נושא כהה לממשק</div>
+                                    </div>
+                                </div>
+                                <button onClick={toggleDark} className={`w-12 h-6 rounded-full transition-colors relative ${isDark ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${isDark ? 'left-1' : 'left-7'}`}></span>
+                                </button>
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-50 dark:bg-slate-700 rounded-lg text-blue-600 dark:text-blue-400"><Icons.Globe className="w-5 h-5" /></div>
+                                    <div>
+                                        <div className="font-medium text-slate-800 dark:text-white">שפת ממשק</div>
+                                        <div className="text-xs text-gray-500 dark:text-slate-400">בחר את השפה המועדפת עליך</div>
+                                    </div>
+                                </div>
+                                <select className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm outline-none text-slate-700 dark:text-slate-300">
+                                    <option>עברית</option>
+                                    <option>English</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 2. SHIPMENT HUB (RESTORED - FULL VERSION WITH DARK MODE) ---
+        const ShipmentHub = ({ onCheckout, onHistory }) => {
             const [purchaseAmount, setPurchaseAmount] = useState(5000);
             const [isHovering, setIsHovering] = useState(false);
 
@@ -114,20 +308,13 @@
             const MIN_AMOUNT = 100;
             const MAX_AMOUNT = 300000;
             
-            // Logarithmic slider logic
             const minLog = Math.log(MIN_AMOUNT);
             const maxLog = Math.log(MAX_AMOUNT);
 
-            const getSliderValue = (val) => {
-                const scale = (Math.log(val) - minLog) / (maxLog - minLog);
-                return scale * 100;
-            };
-
+            const getSliderValue = (val) => ((Math.log(val) - minLog) / (maxLog - minLog)) * 100;
             const getRealValue = (position) => {
                 if (position === 0) return MIN_AMOUNT;
-                const scale = position / 100;
-                const val = Math.exp(minLog + scale * (maxLog - minLog));
-                return Math.round(val / 100) * 100;
+                return Math.round(Math.exp(minLog + (position / 100) * (maxLog - minLog)) / 100) * 100;
             };
 
             const getPricePerUnit = (amount) => {
@@ -139,7 +326,6 @@
 
             const pricePerUnit = getPricePerUnit(purchaseAmount);
             const totalPrice = purchaseAmount * pricePerUnit;
-
             const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
             const formatNumber = (val) => new Intl.NumberFormat('he-IL').format(val);
 
@@ -153,64 +339,76 @@
             };
 
             return (
-                <div className="space-y-8 animate-in fade-in duration-500">
-                    {/* HERO SECTION */}
+                <div className="space-y-8 animate-in fade-in duration-500 p-8 max-w-5xl mx-auto">
+                    {/* HERO SECTION - COMPACT & SLIM */}
                     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+                        <div className="md:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
                             <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
-                            <div className="flex justify-between items-start relative z-10">
+                            <div className="flex justify-between items-center relative z-10 h-full">
                                 <div>
-                                    <h2 className="text-gray-500 font-medium mb-1 flex items-center gap-2">
+                                    <h2 className="text-gray-500 dark:text-slate-400 text-sm font-medium flex items-center gap-2 mb-1">
                                         <Icons.Package className="w-4 h-4" />
                                         יתרת משלוחים נוכחית
                                     </h2>
-                                    <div className="flex items-baseline gap-2 mt-2">
-                                        <span className="text-5xl font-extrabold tracking-tight text-slate-900">
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-3xl font-extrabold text-slate-900 dark:text-white">
                                             {formatNumber(CURRENT_BALANCE)}
                                         </span>
-                                        <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full flex items-center gap-1">
+                                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                                             <Icons.TrendingUp className="w-3 h-3" />
                                             מצב מצוין
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-400 mt-4">
-                                        היתרה מספיקה לכ-3 שבועות של פעילות.
-                                    </p>
                                 </div>
-                                <div className="bg-emerald-100 p-4 rounded-full opacity-80 group-hover:scale-110 transition-transform duration-500">
-                                    <Icons.CheckCircle2 className="w-8 h-8 text-emerald-600" />
+                                <div className="bg-emerald-100 dark:bg-emerald-900/40 p-2.5 rounded-full opacity-80 group-hover:scale-110 transition-transform duration-500">
+                                    <Icons.CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                                 </div>
                             </div>
-                            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-gray-50 rounded-full opacity-50 z-0 pointer-events-none"></div>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center text-center hover:shadow-md transition-shadow duration-300">
-                            <div className="bg-blue-50 p-3 rounded-full mb-3">
-                                <Icons.TrendingUp className="w-6 h-6 text-blue-600" />
+                        {/* COMPACTED: Combined Monthly Stats & History Card */}
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-0 flex flex-col justify-between hover:shadow-md transition-shadow duration-300 overflow-hidden">
+                            <div className="px-4 py-2 flex items-center justify-between h-full">
+                                <div>
+                                    <h3 className="text-xs font-medium text-gray-500 dark:text-slate-400">צריכה חודשית</h3>
+                                    <div className="flex items-baseline gap-2">
+                                        <p className="text-xl font-bold text-slate-800 dark:text-white">2,450</p>
+                                        <span className="text-[10px] text-gray-400 dark:text-slate-500">30 יום</span>
+                                    </div>
+                                </div>
+                                <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-full">
+                                    <Icons.TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                </div>
                             </div>
-                            <h3 className="text-lg font-semibold text-slate-900">צריכה חודשית</h3>
-                            <p className="text-3xl font-bold text-slate-700 mt-1">2,450</p>
-                            <p className="text-xs text-gray-400 mt-1">משלוחים ב-30 ימים אחרונים</p>
+                            
+                            <button 
+                                onClick={onHistory}
+                                className="w-full py-2 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center justify-center gap-2 group"
+                            >
+                                <Icons.History className="w-3 h-3 text-gray-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                                היסטוריית פעולות
+                                <Icons.ChevronLeft className="w-3 h-3 text-gray-400 dark:text-slate-500 transition-transform group-hover:-translate-x-1 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                            </button>
                         </div>
                     </section>
 
                     {/* PURCHASE ZONE */}
-                    <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                        <div className="flex items-center gap-3 mb-8 border-b border-gray-100 pb-4">
-                            <div className="bg-indigo-100 p-2 rounded-lg">
-                                <Icons.ShoppingCart className="w-5 h-5 text-indigo-600" />
+                    <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-8">
+                        <div className="flex items-center gap-3 mb-8 border-b border-gray-100 dark:border-slate-700 pb-4">
+                            <div className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg">
+                                <Icons.ShoppingCart className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900">רכישת חבילת משלוחים</h2>
-                                <p className="text-sm text-gray-500">בחר את כמות המשלוחים הרצויה באמצעות הסרגל או הכפתורים</p>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white">רכישת חבילת משלוחים</h2>
+                                <p className="text-sm text-gray-500 dark:text-slate-400">בחר את כמות המשלוחים הרצויה באמצעות הסרגל או הכפתורים</p>
                             </div>
                         </div>
 
-                        <div className="py-8 px-4 bg-slate-50 rounded-xl border border-slate-100 mb-8">
+                        <div className="py-8 px-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700 mb-8">
                             <div className="flex justify-center items-center gap-6 mb-10">
                                 <button 
                                     onClick={() => adjustAmount(-100)}
-                                    className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-md active:scale-95 transition-all"
+                                    className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-md active:scale-95 transition-all"
                                 >
                                     <Icons.Minus className="w-5 h-5" />
                                 </button>
@@ -223,37 +421,38 @@
                                             const val = Math.min(Math.max(Number(e.target.value), MIN_AMOUNT), MAX_AMOUNT);
                                             setPurchaseAmount(val);
                                         }}
-                                        className="text-center font-extrabold text-5xl text-slate-800 bg-transparent outline-none w-full p-0 tracking-tight"
+                                        className="text-center font-extrabold text-5xl text-slate-800 dark:text-white bg-transparent outline-none w-full p-0 tracking-tight"
                                     />
-                                    <span className="text-gray-400 font-medium text-sm mt-2 tracking-wide uppercase">משלוחים להזמנה</span>
+                                    <span className="text-gray-400 dark:text-slate-500 font-medium text-sm mt-2 tracking-wide uppercase">משלוחים להזמנה</span>
                                 </div>
 
                                 <button 
                                     onClick={() => adjustAmount(100)}
-                                    className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-md active:scale-95 transition-all"
+                                    className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-md active:scale-95 transition-all"
                                 >
                                     <Icons.Plus className="w-5 h-5" />
                                 </button>
                             </div>
 
-                            <div className="relative h-10 flex items-center px-4">
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    step="0.1"
-                                    value={getSliderValue(purchaseAmount)}
-                                    onChange={handleSliderChange}
-                                    className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-10 relative"
-                                />
-                            </div>
-                            
-                            <div className="flex justify-between text-xs font-medium text-gray-400 px-1 mt-1 font-mono">
-                                <span>100</span>
-                                <span>1,000</span>
-                                <span>10,000</span>
-                                <span>100K</span>
-                                <span>300K</span>
+                            {/* Standard RTL Slider Container */}
+                            <div>
+                                <div className="relative h-10 flex items-center px-4">
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        step="0.1"
+                                        value={getSliderValue(purchaseAmount)}
+                                        onChange={handleSliderChange}
+                                        className="w-full h-3 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-10 relative"
+                                    />
+                                </div>
+                                
+                                {/* Labels - Only Start and End (Swapped for RTL) */}
+                                <div className="flex justify-between text-xs font-medium text-gray-400 dark:text-slate-500 font-mono px-1 mt-2">
+                                    <span>100</span>
+                                    <span>300K</span>
+                                </div>
                             </div>
                         </div>
 
@@ -265,7 +464,7 @@
                                     className={`py-3 px-3 rounded-xl text-sm font-medium transition-all border ${
                                         purchaseAmount === amount 
                                             ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
-                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+                                            : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-gray-300'
                                     }`}
                                 >
                                     +{formatNumber(amount)}
@@ -273,13 +472,13 @@
                             ))}
                         </div>
 
-                        <div className="bg-slate-900 rounded-xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
+                        <div className="bg-slate-900 dark:bg-black rounded-xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
                             <div className="space-y-1 text-center sm:text-right w-full sm:w-auto">
-                                <div className="flex justify-between sm:justify-start gap-4 text-sm text-gray-400">
+                                <div className="flex justify-between sm:justify-start gap-4 text-sm text-gray-400 items-center">
                                     <span>מחיר ליחידה:</span>
                                     <span className="font-medium text-white">{formatCurrency(pricePerUnit)}</span>
                                 </div>
-                                <div className="flex justify-between sm:justify-start gap-4 items-baseline">
+                                <div className="flex justify-between sm:justify-start gap-4 items-center">
                                     <span className="text-gray-300 font-medium">סה"כ לתשלום:</span>
                                     <span className="text-3xl font-bold">{formatCurrency(totalPrice)}</span>
                                 </div>
@@ -300,275 +499,177 @@
                             </button>
                         </div>
                     </section>
+                </div>
+            );
+        };
+
+        const CheckoutPage = ({ onBack }) => (
+            <div className="p-8 max-w-2xl mx-auto animate-in fade-in text-center">
+                <button onClick={onBack} className="mb-6 text-slate-500 dark:text-slate-400 hover:text-blue-600 flex items-center justify-center gap-2"><Icons.ArrowRight className="w-4 h-4"/> חזרה</button>
+                <div className="bg-white dark:bg-slate-800 p-12 rounded-3xl shadow-lg border border-gray-100 dark:border-slate-700">
+                    <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-6"><Icons.CreditCard className="w-10 h-10"/></div>
+                    <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">עמוד תשלום</h2>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8">סימולציה של תהליך סליקה מאובטח</p>
+                    <button onClick={() => alert('תשלום בוצע בהצלחה!')} className="bg-slate-900 dark:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold w-full">שלם עכשיו</button>
+                </div>
+            </div>
+        );
+
+        // --- LAYOUT ---
+
+        const Sidebar = ({ active, navigate }) => {
+            const menu = [
+                { id: 'dashboard', icon: Icons.LayoutDashboard, tooltip: 'דשבורד' },
+                { id: 'live', icon: Icons.Activity, tooltip: 'מנג׳ר לייב' },
+                { divider: true },
+                { id: 'purchase', icon: Icons.Package, tooltip: 'רכישת יתרה' }, // Added Purchase
+                { id: 'restaurants', icon: Icons.Utensils, tooltip: 'מסעדות' },
+                { id: 'couriers', icon: Icons.Truck, tooltip: 'שליחים' },
+                { id: 'managers', icon: Icons.Briefcase, tooltip: 'מנהלים' },
+                { divider: true },
+                { id: 'orders', icon: Icons.ClipboardList, tooltip: 'הזמנות' },
+                { id: 'reports', icon: Icons.BarChart, tooltip: 'דוחות' },
+                { id: 'performance', icon: Icons.TrendingUp, tooltip: 'ביצועים' },
+                { divider: true },
+                { id: 'settings', icon: Icons.Settings, tooltip: 'הגדרות' },
+            ];
+
+            return (
+                <div className="w-20 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 flex flex-col items-center py-6 z-20 shadow-sm transition-colors duration-300">
+                    <div className="mb-8 p-3 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-600/30 overflow-hidden w-12 h-12 flex items-center justify-center">
+                        {/* CUSTOM APP LOGO - Static */}
+                        <Icons.CustomAppLogo className="w-8 h-8" />
+                    </div>
                     
-                    {/* PCI FOOTER */}
-                    <div className="flex justify-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all pb-8">
-                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                            <div className="w-8 h-5 bg-gray-200 rounded"></div>
-                            <div className="w-8 h-5 bg-gray-200 rounded"></div>
-                            <div className="w-8 h-5 bg-gray-200 rounded"></div>
-                            <span className="flex items-center gap-1"><Icons.Lock className="w-3 h-3"/> תשלום מאובטח בתקן PCI</span>
-                        </div>
+                    <div className="flex-1 w-full space-y-3 px-3 overflow-y-auto no-scrollbar">
+                        {menu.map((item, idx) => (
+                            item.divider ? 
+                            <div key={idx} className="h-px bg-gray-200 dark:bg-slate-700 w-full my-2"></div> :
+                            <button 
+                                key={item.id}
+                                onClick={() => navigate(item.id)}
+                                className={`w-full aspect-square flex items-center justify-center rounded-xl transition-all duration-200 group relative ${
+                                    active === item.id 
+                                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                                    : 'text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
+                                }`}
+                            >
+                                <item.icon className="w-6 h-6" />
+                                {/* Tooltip */}
+                                <div className="absolute right-full mr-4 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                    {item.tooltip}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="mt-4 px-3 w-full">
+                        <button className="w-full aspect-square flex items-center justify-center rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
+                            <Icons.LogOut className="w-6 h-6" />
+                        </button>
                     </div>
                 </div>
             );
         };
 
-        // 2. CHECKOUT & SETTINGS PAGE
-        const CheckoutPage = ({ orderData, onBack }) => {
-            const [isLoading, setIsLoading] = useState(false);
-
-            const handlePayment = () => {
-                setIsLoading(true);
-                setTimeout(() => {
-                    setIsLoading(false);
-                    alert('תשלום בוצע בהצלחה! (סימולציה)');
-                }, 2000);
-            };
-
-            const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
-            const formatNumber = (val) => new Intl.NumberFormat('he-IL').format(val);
-
-            return (
-                <div className="space-y-6 animate-in slide-in-from-right duration-500">
-                    {/* Back Button */}
-                    <button 
-                        onClick={onBack}
-                        className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors font-medium mb-4"
-                    >
-                        <Icons.ArrowRight className="w-4 h-4" />
-                        חזרה לבחירת חבילה
+        const TopBar = ({ title, balance, onBalanceClick, isDark, toggleDark }) => (
+            <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 transition-colors duration-300">
+                <h1 className="text-xl font-bold text-slate-800 dark:text-white">{title}</h1>
+                
+                <div className="flex items-center gap-6">
+                    {/* Quick Dark Mode Toggle */}
+                    <button onClick={toggleDark} className="text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        {isDark ? <Icons.Sun className="w-5 h-5" /> : <Icons.Moon className="w-5 h-5" />}
                     </button>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        
-                        {/* RIGHT COLUMN: Forms */}
-                        <div className="lg:col-span-2 space-y-6">
-                            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-                                <Icons.AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-                                <div>
-                                    <h4 className="font-bold text-blue-900 text-sm">השלמת רכישה מאובטחת</h4>
-                                    <p className="text-xs text-blue-700 mt-1">אנא וודא את פרטי החשבונית ומלא את פרטי האשראי.</p>
-                                </div>
-                            </div>
+                    <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
 
-                            {/* Form 1: Business Details */}
-                            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-                                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
-                                        <Icons.Building2 className="w-5 h-5" />
-                                    </div>
-                                    <h3 className="font-bold text-slate-800">פרטי העסק לחשבונית</h3>
-                                </div>
-                                
-                                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-gray-700">שם העסק</label>
-                                        <input type="text" defaultValue="[שם העסק]" className="input-field" />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-gray-700">ח.פ / עוסק מורשה</label>
-                                        <div className="relative">
-                                            <input type="text" defaultValue="314917972" className="input-field font-mono" />
-                                            <Icons.ShieldCheck className="absolute left-3 top-3 w-5 h-5 text-emerald-500" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Form 2: Contact Info */}
-                            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-                                    <div className="bg-orange-100 p-2 rounded-lg text-orange-600">
-                                        <Icons.User className="w-5 h-5" />
-                                    </div>
-                                    <h3 className="font-bold text-slate-800">פרטי איש קשר</h3>
-                                </div>
-                                
-                                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-gray-700">שם מלא</label>
-                                        <input type="text" defaultValue="אלכס" className="input-field" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-gray-700">מייל לחשבונית</label>
-                                        <input type="email" defaultValue="alex@business.co.il" className="input-field dir-ltr text-right" />
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Form 3: CREDIT CARD DETAILS */}
-                            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600">
-                                            <Icons.CreditCard className="w-5 h-5" />
-                                        </div>
-                                        <h3 className="font-bold text-slate-800">פרטי אשראי</h3>
-                                    </div>
-                                    <div className="flex gap-2 opacity-50">
-                                        <div className="w-8 h-5 bg-gray-300 rounded"></div>
-                                        <div className="w-8 h-5 bg-gray-300 rounded"></div>
-                                    </div>
-                                </div>
-
-                                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className="text-sm font-semibold text-gray-700">מספר כרטיס</label>
-                                        <div className="relative">
-                                            <input 
-                                                type="text" 
-                                                placeholder="0000 0000 0000 0000" 
-                                                className="input-field font-mono text-lg tracking-wider pl-10 dir-ltr" 
-                                            />
-                                            <Icons.CreditCard className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-gray-700">תוקף (MM/YY)</label>
-                                        <div className="relative">
-                                            <input 
-                                                type="text" 
-                                                placeholder="MM/YY" 
-                                                className="input-field font-mono text-center tracking-widest pl-10 dir-ltr" 
-                                            />
-                                            <Icons.Calendar className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-gray-700">קוד בגב הכרטיס (CVV)</label>
-                                        <div className="relative">
-                                            <input 
-                                                type="text" 
-                                                placeholder="123" 
-                                                className="input-field font-mono text-center tracking-widest pl-10 dir-ltr" 
-                                                maxLength={3}
-                                            />
-                                            <Icons.Lock className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className="text-sm font-semibold text-gray-700">ת.ז. בעל הכרטיס</label>
-                                        <input type="text" placeholder="הקלד מספר תעודת זהות" className="input-field" />
-                                    </div>
-                                </div>
-                            </section>
+                    <button 
+                        onClick={onBalanceClick}
+                        className="text-right hover:bg-gray-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg transition-colors group cursor-pointer"
+                    >
+                        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 transition-colors">[שם העסק]</p>
+                        <div className="flex items-center justify-end gap-1 mt-0.5">
+                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 rounded-md">
+                                {new Intl.NumberFormat('he-IL').format(balance)}
+                            </span>
+                            <span className="text-[10px] text-gray-400 dark:text-slate-500">משלוחים</span>
                         </div>
-
-                        {/* LEFT COLUMN: Order Summary & Payment */}
-                        <div className="lg:col-span-1 space-y-6">
-                            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
-                                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                    <Icons.ShoppingCart className="w-5 h-5 text-gray-400" />
-                                    סיכום הזמנה
-                                </h3>
-                                
-                                <div className="space-y-4 mb-8">
-                                    <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                                        <span className="text-gray-600">חבילת משלוחים</span>
-                                        <span className="font-bold text-slate-800">{formatNumber(orderData.amount)} יח'</span>
-                                    </div>
-                                    <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                                        <span className="text-gray-600">מחיר ליחידה</span>
-                                        <span className="font-medium text-slate-800">{(orderData.price / orderData.amount).toFixed(2)} ₪</span>
-                                    </div>
-                                    <div className="flex justify-between items-center pt-2">
-                                        <span className="text-lg font-bold text-slate-900">סה"כ לתשלום</span>
-                                        <span className="text-2xl font-extrabold text-blue-600">{formatCurrency(orderData.price)}</span>
-                                    </div>
-                                    <p className="text-xs text-center text-gray-400">המחיר כולל מע"מ</p>
-                                </div>
-
-                                <button 
-                                    onClick={handlePayment}
-                                    disabled={isLoading}
-                                    className="w-full bg-slate-900 hover:bg-emerald-600 text-white py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 font-bold text-lg disabled:opacity-70 disabled:cursor-not-allowed"
-                                >
-                                    {isLoading ? (
-                                        <>
-                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                            מעבד תשלום...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Icons.CheckCircle2 className="w-5 h-5" />
-                                            אישור ותשלום
-                                        </>
-                                    )}
-                                </button>
-
-                                <div className="mt-6 text-center">
-                                    <p className="text-xs text-gray-400 mb-2">אנו מכבדים את כל סוגי הכרטיסים</p>
-                                    <div className="flex justify-center gap-2 opacity-50">
-                                        <div className="w-8 h-5 bg-gray-200 rounded"></div>
-                                        <div className="w-8 h-5 bg-gray-200 rounded"></div>
-                                        <div className="w-8 h-5 bg-gray-200 rounded"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </button>
+                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700">א</div>
                 </div>
-            );
-        };
+            </header>
+        );
 
-        // 3. MAIN APP
-        const ShipmentApp = () => {
-            const [currentView, setCurrentView] = useState('hub');
-            const [checkoutData, setCheckoutData] = useState(null);
+        // --- APP ---
+        const App = () => {
+            const [section, setSection] = useState('dashboard');
+            const [isDark, setIsDark] = useState(false);
+            
+            // Handle Dark Mode Class on Body
+            useEffect(() => {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }, [isDark]);
 
-            const handleGoToCheckout = (data) => {
-                setCheckoutData(data);
-                setCurrentView('checkout');
-                window.scrollTo(0, 0);
-            };
-
-            const handleBackToHub = () => {
-                setCurrentView('hub');
-                window.scrollTo(0, 0);
+            const getTitle = () => {
+                switch(section) {
+                    case 'dashboard': return 'דשבורד';
+                    case 'live': return 'ניהול משלוחים לייב';
+                    case 'restaurants': return 'ניהול מסעדות';
+                    case 'couriers': return 'ניהול שליחים';
+                    case 'managers': return 'ניהול מנהלים';
+                    case 'orders': return 'הזמנות';
+                    case 'reports': return 'דוחות ונתונים';
+                    case 'performance': return 'ביצועים';
+                    case 'settings': return 'הגדרות';
+                    case 'purchase': return 'רכישת יתרה';
+                    case 'checkout': return 'תשלום';
+                    default: return '';
+                }
             };
 
             return (
-                <div className="min-h-screen bg-gray-50 text-slate-800 font-sans" dir="rtl">
-                    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-                        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="bg-blue-600 p-2 rounded-lg">
-                                    <Icons.Package className="w-5 h-5 text-white" />
-                                </div>
-                                <h1 className="text-xl font-bold text-slate-900">
-                                    ניהול משלוחים – <span className="text-blue-600">[שם העסק]</span>
-                                </h1>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="hidden sm:flex flex-col items-end">
-                                    <span className="text-sm font-medium text-slate-700">אלכס</span>
-                                    <span className="text-xs text-gray-500">[שם העסק]</span>
-                                </div>
-                                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm border border-blue-200">
-                                    א
-                                </div>
-                            </div>
+                <div className={`flex w-full h-full bg-gray-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300`}>
+                    <Sidebar active={section} navigate={setSection} />
+                    
+                    <div className="flex-1 flex flex-col h-full overflow-hidden">
+                        <TopBar 
+                            title={getTitle()} 
+                            balance={10442} 
+                            onBalanceClick={() => setSection('purchase')} 
+                            isDark={isDark}
+                            toggleDark={() => setIsDark(!isDark)}
+                        />
+                        
+                        <div className="flex-1 overflow-y-auto p-0 scroll-smooth">
+                            {section === 'dashboard' && <Dashboard />}
+                            {section === 'live' && <ConstructionPage title="ניהול משלוחים לייב" icon={Icons.Activity} />}
+                            
+                            {section === 'restaurants' && <ConstructionPage title="ניהול מסעדות" icon={Icons.Utensils} />}
+                            {section === 'couriers' && <ConstructionPage title="ניהול שליחים" icon={Icons.Truck} />}
+                            {section === 'managers' && <ConstructionPage title="ניהול מנהלים" icon={Icons.Briefcase} />}
+                            
+                            {section === 'orders' && <ConstructionPage title="היסטוריית הזמנות" icon={Icons.ClipboardList} />}
+                            {section === 'reports' && <ConstructionPage title="דוחות" icon={Icons.BarChart} />}
+                            {section === 'performance' && <ConstructionPage title="ביצועים" icon={Icons.TrendingUp} />}
+                            
+                            {section === 'settings' && <SettingsPage isDark={isDark} toggleDark={() => setIsDark(!isDark)} />}
+                            
+                            {/* Functional Previous Pages */}
+                            {section === 'purchase' && <ShipmentHub onCheckout={() => setSection('checkout')} />}
+                            {section === 'checkout' && <CheckoutPage onBack={() => setSection('purchase')} />}
                         </div>
-                    </header>
-
-                    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        {currentView === 'hub' ? (
-                            <ShipmentHub onCheckout={handleGoToCheckout} />
-                        ) : (
-                            <CheckoutPage orderData={checkoutData} onBack={handleBackToHub} />
-                        )}
-                    </main>
+                    </div>
                 </div>
             );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<ShipmentApp />);
+        root.render(<App />);
     </script>
 </body>
 </html>
