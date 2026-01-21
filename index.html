@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מערכת ניהול משלוחים - האב עסקי</title>
     
-    <!-- Tailwind CSS (עיצוב) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,11 +24,11 @@
         }
     </script>
     
-    <!-- React & ReactDOM (מנוע האפליקציה) -->
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
-    <!-- Babel (תרגום הקוד לדפדפן) -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
@@ -82,7 +82,7 @@
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Hide scrollbar for clean menu (but keep functionality) */
+        /* Hide scrollbar for clean menu (Fix for side scrolling) */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -99,6 +99,15 @@
         }
         input[type=number] {
             -moz-appearance: textfield;
+        }
+        
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #2563eb;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #2563eb;
         }
     </style>
 </head>
@@ -127,7 +136,7 @@
             MapPin: (props) => <Icon {...props} path={<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>} />,
             AlertCircle: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></>} />,
             CheckCircle2: (props) => <Icon {...props} path={<><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></>} />,
-            ChevronLeft: (props) => <Icon {...props} path={<path d="m15 18-6-6 6-6"/>} />,
+            ChevronLeft: (props) => <Icon {...props} path={<><path d="m15 18-6-6 6-6"/></>} />,
             CreditCard: (props) => <Icon {...props} path={<><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></>} />,
             Minus: (props) => <Icon {...props} path={<path d="M5 12h14"/>} />,
             ArrowRight: (props) => <Icon {...props} path={<path d="M5 12h14M12 5l7 7-7 7"/>} />,
@@ -154,8 +163,6 @@
             Globe: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>} />,
             Moon: (props) => <Icon {...props} path={<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>} />,
             Sun: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></>} />,
-            Helmet: (props) => <Icon {...props} path={<><path d="M12 4a8 8 0 0 0-8 8v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a8 8 0 0 0-8-8z"/><path d="M4 13h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z"/></>} />,
-            Upload: (props) => <Icon {...props} path={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></>} />,
             // CUSTOM APP LOGO ICON WRAPPER
             CustomAppLogo: (props) => (
                 <svg viewBox="0 0 624 624" fill="none" xmlns="http://www.w3.org/2000/svg" className={props.className}>
@@ -298,6 +305,34 @@
                 </div>
             );
         };
+        
+        // --- 6. INVOICES HISTORY COMPONENT ---
+        const InvoicesHistory = ({ onBack }) => {
+            const invoices = [
+                { id: 1, date: '20/01/2026', amount: 3500, desc: 'רכישת חבילת משלוחים (10,000 יח\')', number: 'INV-2026-001', status: 'שולם' },
+                { id: 2, date: '15/12/2025', amount: 1500, desc: 'רכישת חבילת משלוחים (3,000 יח\')', number: 'INV-2025-089', status: 'שולם' },
+                { id: 3, date: '01/11/2025', amount: 4500, desc: 'רכישת חבילת משלוחים (15,000 יח\')', number: 'INV-2025-052', status: 'שולם' },
+            ];
+            const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
+
+            return (
+                <div className="space-y-6 animate-in slide-in-from-right duration-500 p-8 max-w-7xl mx-auto">
+                    {/* Back Button */}
+                    <button 
+                        onClick={onBack}
+                        className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors font-medium mb-4"
+                    >
+                        <Icons.ArrowRight className="w-4 h-4" />
+                        חזרה לכספים
+                    </button>
+
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"><div className="flex items-center gap-3"><div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Icons.FileText className="w-5 h-5" /></div><div><h3 className="font-bold text-slate-800 text-lg">היסטוריית רכישות</h3><p className="text-sm text-gray-500">צפייה והורדה של חשבוניות מס עבור רכישות יתרה</p></div></div></div>
+                        <div className="overflow-x-auto"><table className="w-full text-right"><thead className="bg-gray-50 text-gray-500 text-sm font-semibold uppercase tracking-wider"><tr><th className="px-6 py-4">תאריך</th><th className="px-6 py-4">מספר חשבונית</th><th className="px-6 py-4">תיאור</th><th className="px-6 py-4">סכום</th><th className="px-6 py-4">סטטוס</th><th className="px-6 py-4">פעולות</th></tr></thead><tbody className="divide-y divide-gray-100 text-sm text-slate-700">{invoices.map((inv) => (<tr key={inv.id} className="hover:bg-slate-50 transition-colors"><td className="px-6 py-4 font-medium">{inv.date}</td><td className="px-6 py-4 font-mono text-gray-500">{inv.number}</td><td className="px-6 py-4">{inv.desc}</td><td className="px-6 py-4 font-bold">{formatCurrency(inv.amount)}</td><td className="px-6 py-4"><span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-semibold">{inv.status}</span></td><td className="px-6 py-4"><button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all font-medium"><Icons.Download className="w-4 h-4" />הורד</button></td></tr>))}</tbody></table></div>
+                    </div>
+                </div>
+            );
+        };
 
         // --- 2. SHIPMENT HUB (RESTORED - FULL VERSION WITH DARK MODE) ---
         const ShipmentHub = ({ onCheckout, onHistory }) => {
@@ -342,9 +377,11 @@
                 <div className="space-y-8 animate-in fade-in duration-500 p-8 max-w-5xl mx-auto">
                     {/* HERO SECTION - COMPACT & SLIM */}
                     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+                        <div className="md:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-0 relative overflow-hidden group hover:shadow-md transition-shadow duration-300 flex flex-col">
                             <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
-                            <div className="flex justify-between items-center relative z-10 h-full">
+                            
+                            {/* Card Content - Now fills available space minus footer */}
+                            <div className="p-4 flex justify-between items-center relative z-10 flex-1">
                                 <div>
                                     <h2 className="text-gray-500 dark:text-slate-400 text-sm font-medium flex items-center gap-2 mb-1">
                                         <Icons.Package className="w-4 h-4" />
@@ -364,31 +401,28 @@
                                     <Icons.CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                                 </div>
                             </div>
-                        </div>
 
-                        {/* COMPACTED: Combined Monthly Stats & History Card */}
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-0 flex flex-col justify-between hover:shadow-md transition-shadow duration-300 overflow-hidden">
-                            <div className="px-4 py-2 flex items-center justify-between h-full">
-                                <div>
-                                    <h3 className="text-xs font-medium text-gray-500 dark:text-slate-400">צריכה חודשית</h3>
-                                    <div className="flex items-baseline gap-2">
-                                        <p className="text-xl font-bold text-slate-800 dark:text-white">2,450</p>
-                                        <span className="text-[10px] text-gray-400 dark:text-slate-500">30 יום</span>
-                                    </div>
-                                </div>
-                                <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-full">
-                                    <Icons.TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                                </div>
-                            </div>
-                            
+                            {/* Moved History Button Here */}
                             <button 
                                 onClick={onHistory}
-                                className="w-full py-2 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center justify-center gap-2 group"
+                                className="w-full py-2 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center justify-center gap-2 group/btn relative z-10"
                             >
-                                <Icons.History className="w-3 h-3 text-gray-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                                היסטוריית פעולות
-                                <Icons.ChevronLeft className="w-3 h-3 text-gray-400 dark:text-slate-500 transition-transform group-hover:-translate-x-1 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                                <Icons.History className="w-3 h-3 text-gray-400 dark:text-slate-500 group-hover/btn:text-blue-600 dark:group-hover/btn:text-blue-400" />
+                                היסטוריית רכישות ושימושים
+                                <Icons.ChevronLeft className="w-3 h-3 text-gray-400 dark:text-slate-500 transition-transform group-hover/btn:-translate-x-1 group-hover/btn:text-blue-600 dark:group-hover/btn:text-blue-400" />
                             </button>
+                        </div>
+
+                        {/* COMPACTED: Combined Monthly Stats - No Button */}
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-5 flex flex-col justify-center items-center text-center hover:shadow-md transition-shadow duration-300">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-full mb-2">
+                                <Icons.TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <h3 className="text-xs font-medium text-gray-500 dark:text-slate-400">צריכה חודשית</h3>
+                            <div className="flex items-baseline gap-2 mt-1">
+                                <p className="text-2xl font-bold text-slate-800 dark:text-white">2,450</p>
+                                <span className="text-[10px] text-gray-400 dark:text-slate-500">30 יום</span>
+                            </div>
                         </div>
                     </section>
 
@@ -522,14 +556,9 @@
                 { id: 'dashboard', icon: Icons.LayoutDashboard, tooltip: 'דשבורד' },
                 { id: 'live', icon: Icons.Activity, tooltip: 'מנג׳ר לייב' },
                 { divider: true },
-                { id: 'purchase', icon: Icons.Package, tooltip: 'רכישת יתרה' }, // Added Purchase
-                { id: 'restaurants', icon: Icons.Utensils, tooltip: 'מסעדות' },
-                { id: 'couriers', icon: Icons.Truck, tooltip: 'שליחים' },
-                { id: 'managers', icon: Icons.Briefcase, tooltip: 'מנהלים' },
-                { divider: true },
-                { id: 'orders', icon: Icons.ClipboardList, tooltip: 'הזמנות' },
-                { id: 'reports', icon: Icons.BarChart, tooltip: 'דוחות' },
-                { id: 'performance', icon: Icons.TrendingUp, tooltip: 'ביצועים' },
+                { id: 'entities', icon: Icons.Users, tooltip: 'ניהול ישויות' }, // Grouped
+                { id: 'data', icon: Icons.BarChart, tooltip: 'מרכז נתונים' }, // Grouped
+                { id: 'finance', icon: Icons.CreditCard, tooltip: 'כספים' }, // Grouped
                 { divider: true },
                 { id: 'settings', icon: Icons.Settings, tooltip: 'הגדרות' },
             ];
@@ -577,12 +606,6 @@
                 <h1 className="text-xl font-bold text-slate-800 dark:text-white">{title}</h1>
                 
                 <div className="flex items-center gap-6">
-                    {/* Quick Dark Mode Toggle */}
-                    <button onClick={toggleDark} className="text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-                        {isDark ? <Icons.Sun className="w-5 h-5" /> : <Icons.Moon className="w-5 h-5" />}
-                    </button>
-
-                    <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
 
                     <button 
                         onClick={onBalanceClick}
@@ -601,12 +624,293 @@
             </header>
         );
 
+        // --- SUB-NAVIGATION COMPONENT (TABS) ---
+        const Tabs = ({ tabs, active, onChange }) => {
+            const labels = {
+                'restaurants': 'מסעדות',
+                'couriers': 'שליחים',
+                'managers': 'מנהלים',
+                'orders': 'הזמנות',
+                'reports': 'דוחות',
+                'performance': 'ביצועים',
+                'purchase': 'רכישת יתרה',
+                'pricing': 'תמחור',
+                'zones': 'אזורי משלוח',
+                'payouts': 'תשלומים' // Updated Label
+            };
+
+            return (
+                <div className="flex gap-2 border-b border-gray-200 dark:border-slate-700 mb-6">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => onChange(tab)}
+                            className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                                active === tab
+                                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200'
+                            }`}
+                        >
+                            {labels[tab] || tab}
+                        </button>
+                    ))}
+                </div>
+            );
+        };
+
+        // --- PAGE WRAPPERS FOR GROUPED CONTENT ---
+        
+        const EntitiesPage = () => {
+            const [tab, setTab] = useState('restaurants');
+            return (
+                <div className="p-8 h-full flex flex-col">
+                    <Tabs tabs={['restaurants', 'couriers', 'managers']} active={tab} onChange={setTab} />
+                    <div className="flex-1 overflow-y-auto">
+                        {tab === 'restaurants' && <ConstructionPage title="ניהול מסעדות" icon={Icons.Utensils} />}
+                        {tab === 'couriers' && <ConstructionPage title="ניהול שליחים" icon={Icons.Truck} />}
+                        {tab === 'managers' && <ConstructionPage title="ניהול מנהלים" icon={Icons.Briefcase} />}
+                    </div>
+                </div>
+            );
+        };
+
+        const DataPage = () => {
+            const [tab, setTab] = useState('orders');
+            return (
+                <div className="p-8 h-full flex flex-col">
+                    <Tabs tabs={['orders', 'reports', 'performance']} active={tab} onChange={setTab} />
+                    <div className="flex-1 overflow-y-auto">
+                        {tab === 'orders' && <ConstructionPage title="היסטוריית הזמנות" icon={Icons.ClipboardList} />}
+                        {tab === 'reports' && <ConstructionPage title="דוחות" icon={Icons.BarChart} />}
+                        {tab === 'performance' && <ConstructionPage title="ביצועים" icon={Icons.TrendingUp} />}
+                    </div>
+                </div>
+            );
+        };
+
+        // NEW: Payouts Page Component (Monthly Balance View)
+        const PayoutsPage = () => {
+             // Mock data for current month
+             const currentMonth = "ינואר 2026";
+             const balance = 15430; 
+             const nextPaymentDate = "10/02/2026";
+             
+             // Breakdown
+             const breakdown = [
+                 { label: 'משלוחים שבוצעו (450)', amount: 13500 },
+                 { label: 'תוספות מרחק', amount: 1200 },
+                 { label: 'בונוסים ותמריצים', amount: 730 },
+                 { label: 'קיזוזים / ביטולים', amount: -0 },
+             ];
+
+             const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
+
+             return (
+                <div className="p-8 space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
+                     <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">ריכוז תשלום חודשי</h1>
+                        <p className="text-gray-500 dark:text-slate-400 text-sm">סיכום הפעילות הכספית לחודש {currentMonth}</p>
+                     </div>
+
+                     {/* Hero Card */}
+                     <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-blue-900 dark:to-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-emerald-400"></div>
+                        <div className="flex flex-col md:flex-row justify-between items-center relative z-10">
+                             <div>
+                                 <p className="text-slate-400 font-medium mb-1">סכום לתשלום (משוער)</p>
+                                 <div className="text-5xl font-bold tracking-tight mb-2">{formatCurrency(balance)}</div>
+                                 <div className="inline-flex items-center gap-2 bg-slate-800/50 px-3 py-1 rounded-lg border border-slate-700/50 backdrop-blur-sm">
+                                    <Icons.Calendar className="w-4 h-4 text-emerald-400"/>
+                                    <span className="text-sm">תאריך העברה קרוב: {nextPaymentDate}</span>
+                                 </div>
+                             </div>
+                             <div className="mt-6 md:mt-0 bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/10">
+                                 <div className="text-center">
+                                     <div className="text-xs text-slate-300 uppercase tracking-wider mb-1">סטטוס</div>
+                                     <div className="font-bold text-emerald-400 flex items-center gap-1 justify-center">
+                                         <Icons.CheckCircle2 className="w-4 h-4"/>
+                                         פעיל וצובר
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                     </div>
+
+                     {/* Breakdown & Stats */}
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                         {/* Detailed Breakdown */}
+                         <div className="md:col-span-2 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 p-6 shadow-sm">
+                             <h3 className="font-bold text-slate-900 dark:text-white mb-6">פירוט מרכיבי התשלום</h3>
+                             <div className="space-y-4">
+                                 {breakdown.map((item, idx) => (
+                                     <div key={idx} className="flex justify-between items-center py-3 border-b border-gray-50 dark:border-slate-700/50 last:border-0">
+                                         <span className="text-slate-600 dark:text-slate-300">{item.label}</span>
+                                         <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(item.amount)}</span>
+                                     </div>
+                                 ))}
+                                 <div className="pt-4 mt-2 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                                     <span className="font-bold text-lg text-slate-900 dark:text-white">סה"כ לתשלום</span>
+                                     <span className="font-bold text-xl text-blue-600 dark:text-blue-400">{formatCurrency(balance)}</span>
+                                 </div>
+                             </div>
+                         </div>
+
+                         {/* Action / Info */}
+                         <div className="space-y-6">
+                             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-900/30">
+                                 <div className="bg-blue-100 dark:bg-blue-900/50 w-10 h-10 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                                     <Icons.FileText className="w-5 h-5"/>
+                                 </div>
+                                 <h4 className="font-bold text-slate-900 dark:text-white mb-1">דוח מפורט</h4>
+                                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">הורד גיליון אקסל עם פירוט כל המשלוחים שנכללים בחישוב זה.</p>
+                                 <button className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline">הורד דוח חודשי &larr;</button>
+                             </div>
+                             
+                             <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-slate-700">
+                                 <h4 className="font-bold text-slate-900 dark:text-white mb-3">פרטי חשבון בנק</h4>
+                                 <p className="text-sm text-slate-500 dark:text-slate-400">התשלום יועבר לחשבון המוגדר במערכת:</p>
+                                 <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-900 rounded-xl flex items-center gap-3">
+                                     <div className="bg-white dark:bg-slate-800 p-2 rounded shadow-sm"><Icons.Building2 className="w-4 h-4"/></div>
+                                     <div className="text-sm">
+                                         <div className="font-bold dark:text-white">בנק הפועלים (12)</div>
+                                         <div className="text-xs text-gray-500">סניף 650 • ח-ן 123456</div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+             );
+        };
+
+        const FinancePage = ({ navigate }) => {
+            const [tab, setTab] = useState('purchase');
+            
+            // Function to handle switching to history (used by ShipmentHub button)
+            const goToHistory = () => {
+                navigate('history');
+            };
+
+            return (
+                <div className="h-full flex flex-col">
+                    <div className="px-8 pt-8">
+                         <Tabs tabs={['purchase', 'pricing', 'zones', 'payouts']} active={tab} onChange={setTab} />
+                    </div>
+                    <div className="flex-1 overflow-y-auto">
+                        {tab === 'purchase' && <ShipmentHub onCheckout={(data) => navigate('checkout', data)} onHistory={goToHistory} />}
+                        {tab === 'pricing' && <PricingPage />}
+                        {tab === 'zones' && <ZonesPage />}
+                        {tab === 'payouts' && <PayoutsPage />}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW: PRICING PAGE (Restored) ---
+        const PricingPage = () => {
+            return (
+                <div className="p-8 space-y-6 animate-in fade-in duration-500 max-w-4xl mx-auto">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">תמחור לפי מרחק</h1>
+                        <p className="text-gray-500 dark:text-slate-400 text-sm">הגדר את מודל התמחור למשלוחים על בסיס מרחק אווירי</p>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div className="p-6 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/50 flex gap-4">
+                            <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg text-orange-600 dark:text-orange-400"><Icons.Tag className="w-6 h-6" /></div>
+                            <div>
+                                <h3 className="font-bold text-slate-800 dark:text-white">מחיר בסיס</h3>
+                                <p className="text-sm text-gray-500 dark:text-slate-400">המחיר ההתחלתי לכל משלוח לפני חישוב המרחק</p>
+                            </div>
+                        </div>
+                        <div className="p-6">
+                            <div className="flex items-center gap-4">
+                                <input type="number" defaultValue="35" className="input-field text-xl font-bold w-32 text-center" />
+                                <span className="text-xl font-bold text-slate-700 dark:text-white">₪</span>
+                                <span className="text-gray-400 dark:text-slate-500 mr-2">מחיר קבוע לכל הזמנה</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div className="p-6 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/50 flex gap-4">
+                            <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-purple-600 dark:text-purple-400"><Icons.Ruler className="w-6 h-6" /></div>
+                            <div>
+                                <h3 className="font-bold text-slate-800 dark:text-white">מדרגות מרחק</h3>
+                                <p className="text-sm text-gray-500 dark:text-slate-400">תוספת מחיר לפי קילומטרים מהמחסן הראשי</p>
+                            </div>
+                        </div>
+                        <div className="divide-y divide-gray-100 dark:divide-slate-700">
+                            {[
+                                { range: '0 - 10 ק"מ', price: 'ללא תוספת' },
+                                { range: '10 - 25 ק"מ', price: '+2.5 ₪ לק"מ' },
+                                { range: '25 - 50 ק"מ', price: '+4.0 ₪ לק"מ' },
+                                { range: 'מעל 50 ק"מ', price: '+6.5 ₪ לק"מ' }
+                            ].map((tier, idx) => (
+                                <div key={idx} className="p-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                    <span className="font-medium text-slate-700 dark:text-slate-200">{tier.range}</span>
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-lg text-sm">{tier.price}</span>
+                                        <button className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"><Icons.Edit2 className="w-4 h-4" /></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="p-4 bg-gray-50 dark:bg-slate-900/50 text-center border-t border-gray-100 dark:border-slate-700">
+                            <button className="text-blue-600 dark:text-blue-400 font-medium text-sm flex items-center justify-center gap-2"><Icons.Plus className="w-4 h-4" /> הוסף מדרגה חדשה</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        // --- NEW: ZONES PAGE (Restored) ---
+        const ZonesPage = () => {
+            const [zones, setZones] = useState([
+                { id: 1, name: 'גוש דן', active: true, priceMod: 0, cities: 'תל אביב, רמת גן, גבעתיים, בני ברק' },
+                { id: 2, name: 'שרון', active: true, priceMod: 15, cities: 'הרצליה, כפר סבא, רעננה, נתניה' },
+                { id: 3, name: 'שפלה', active: false, priceMod: 20, cities: 'ראשון לציון, רחובות, נס ציונה' },
+                { id: 4, name: 'ירושלים והסביבה', active: false, priceMod: 45, cities: 'ירושלים, מבשרת ציון, מעלה אדומים' },
+            ]);
+            const toggleZone = (id) => setZones(zones.map(z => z.id === id ? { ...z, active: !z.active } : z));
+            
+            return (
+                <div className="p-8 space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto">
+                    <div className="flex justify-between items-center">
+                        <div><h1 className="text-2xl font-bold text-slate-900 dark:text-white">אזורי משלוח</h1><p className="text-gray-500 dark:text-slate-400 text-sm">ניהול האזורים אליהם העסק מבצע משלוחים</p></div>
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition-colors"><Icons.Plus className="w-4 h-4" /> הוסף אזור</button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {zones.map(zone => (
+                            <div key={zone.id} className={`bg-white dark:bg-slate-800 rounded-2xl border p-6 transition-all ${zone.active ? 'border-blue-200 dark:border-blue-900/50 shadow-sm' : 'border-gray-100 dark:border-slate-700 opacity-60'}`}>
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`p-2 rounded-lg ${zone.active ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-400 dark:text-slate-500'}`}><Icons.MapPin className="w-5 h-5" /></div>
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{zone.name}</h3>
+                                    </div>
+                                    <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                                        <input type="checkbox" checked={zone.active} onChange={() => toggleZone(zone.id)} className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300" />
+                                        <label className={`toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer ${zone.active ? 'bg-blue-600' : ''}`}></label>
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div><span className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">ערים כלולות</span><p className="text-sm text-gray-600 dark:text-slate-300 mt-1 leading-relaxed">{zone.cities}</p></div>
+                                    <div className="pt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center"><span className="text-sm text-gray-500 dark:text-slate-400">תוספת מחיר</span><span className="font-bold text-slate-800 dark:text-white">+{zone.priceMod} ₪</span></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+
         // --- APP ---
         const App = () => {
             const [section, setSection] = useState('dashboard');
             const [isDark, setIsDark] = useState(false);
+            const [checkoutData, setCheckoutData] = useState(null);
             
-            // Handle Dark Mode Class on Body
             useEffect(() => {
                 if (isDark) {
                     document.documentElement.classList.add('dark');
@@ -615,19 +919,21 @@
                 }
             }, [isDark]);
 
+            const handleNavigate = (target, data) => {
+                if (data) setCheckoutData(data);
+                setSection(target);
+            };
+
             const getTitle = () => {
                 switch(section) {
                     case 'dashboard': return 'דשבורד';
                     case 'live': return 'ניהול משלוחים לייב';
-                    case 'restaurants': return 'ניהול מסעדות';
-                    case 'couriers': return 'ניהול שליחים';
-                    case 'managers': return 'ניהול מנהלים';
-                    case 'orders': return 'הזמנות';
-                    case 'reports': return 'דוחות ונתונים';
-                    case 'performance': return 'ביצועים';
+                    case 'entities': return 'ניהול ישויות';
+                    case 'data': return 'מרכז נתונים';
+                    case 'finance': return 'כספים';
                     case 'settings': return 'הגדרות';
-                    case 'purchase': return 'רכישת יתרה';
                     case 'checkout': return 'תשלום';
+                    case 'history': return 'היסטוריית רכישות';
                     default: return '';
                 }
             };
@@ -640,28 +946,20 @@
                         <TopBar 
                             title={getTitle()} 
                             balance={10442} 
-                            onBalanceClick={() => setSection('purchase')} 
-                            isDark={isDark}
-                            toggleDark={() => setIsDark(!isDark)}
+                            onBalanceClick={() => setSection('finance')} 
                         />
                         
                         <div className="flex-1 overflow-y-auto p-0 scroll-smooth">
                             {section === 'dashboard' && <Dashboard />}
                             {section === 'live' && <ConstructionPage title="ניהול משלוחים לייב" icon={Icons.Activity} />}
-                            
-                            {section === 'restaurants' && <ConstructionPage title="ניהול מסעדות" icon={Icons.Utensils} />}
-                            {section === 'couriers' && <ConstructionPage title="ניהול שליחים" icon={Icons.Truck} />}
-                            {section === 'managers' && <ConstructionPage title="ניהול מנהלים" icon={Icons.Briefcase} />}
-                            
-                            {section === 'orders' && <ConstructionPage title="היסטוריית הזמנות" icon={Icons.ClipboardList} />}
-                            {section === 'reports' && <ConstructionPage title="דוחות" icon={Icons.BarChart} />}
-                            {section === 'performance' && <ConstructionPage title="ביצועים" icon={Icons.TrendingUp} />}
-                            
+                            {section === 'entities' && <EntitiesPage />}
+                            {section === 'data' && <DataPage />}
+                            {section === 'finance' && <FinancePage navigate={handleNavigate} />}
                             {section === 'settings' && <SettingsPage isDark={isDark} toggleDark={() => setIsDark(!isDark)} />}
                             
-                            {/* Functional Previous Pages */}
-                            {section === 'purchase' && <ShipmentHub onCheckout={() => setSection('checkout')} />}
-                            {section === 'checkout' && <CheckoutPage onBack={() => setSection('purchase')} />}
+                            {/* Hidden Pages */}
+                            {section === 'checkout' && <CheckoutPage orderData={checkoutData} onBack={() => setSection('finance')} />}
+                            {section === 'history' && <InvoicesHistory onBack={() => setSection('finance')} />}
                         </div>
                     </div>
                 </div>
