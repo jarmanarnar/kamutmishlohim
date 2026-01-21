@@ -1,0 +1,539 @@
+import React, { useState } from 'react';
+import { 
+  Package, 
+  CreditCard, 
+  Building2, 
+  Edit2, 
+  TrendingUp, 
+  CheckCircle2, 
+  AlertCircle,
+  ShoppingCart,
+  ChevronLeft,
+  Plus,
+  Minus,
+  ArrowRight,
+  ShieldCheck,
+  User,
+  MapPin,
+  Mail,
+  Phone,
+  Save,
+  Lock,
+  Calendar,
+  CreditCard as CreditCardIcon
+} from 'lucide-react';
+
+// --- COMPONENTS ---
+
+// 1. SHIPMENT HUB (The Selection Page)
+const ShipmentHub = ({ onCheckout }) => {
+  const [purchaseAmount, setPurchaseAmount] = useState(5000);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const CURRENT_BALANCE = 10442;
+  const MIN_AMOUNT = 100;
+  const MAX_AMOUNT = 300000;
+  
+  // Logarithmic slider logic
+  const minLog = Math.log(MIN_AMOUNT);
+  const maxLog = Math.log(MAX_AMOUNT);
+
+  const getSliderValue = (val) => {
+    const scale = (Math.log(val) - minLog) / (maxLog - minLog);
+    return scale * 100;
+  };
+
+  const getRealValue = (position) => {
+    if (position === 0) return MIN_AMOUNT;
+    const scale = position / 100;
+    const val = Math.exp(minLog + scale * (maxLog - minLog));
+    return Math.round(val / 100) * 100;
+  };
+
+  const getPricePerUnit = (amount) => {
+    if (amount < 1000) return 0.50;
+    if (amount < 10000) return 0.45;
+    if (amount < 50000) return 0.40;
+    return 0.35;
+  };
+
+  const pricePerUnit = getPricePerUnit(purchaseAmount);
+  const totalPrice = purchaseAmount * pricePerUnit;
+
+  const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
+  const formatNumber = (val) => new Intl.NumberFormat('he-IL').format(val);
+
+  const handleSliderChange = (e) => {
+    const newVal = getRealValue(Number(e.target.value));
+    setPurchaseAmount(Math.min(Math.max(newVal, MIN_AMOUNT), MAX_AMOUNT));
+  };
+
+  const adjustAmount = (delta) => {
+    setPurchaseAmount(prev => Math.min(Math.max(prev + delta, MIN_AMOUNT), MAX_AMOUNT));
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* HERO SECTION */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+          <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
+          <div className="flex justify-between items-start relative z-10">
+            <div>
+              <h2 className="text-gray-500 font-medium mb-1 flex items-center gap-2">
+                <Package className="w-4 h-4" />
+                יתרת משלוחים נוכחית
+              </h2>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-5xl font-extrabold tracking-tight text-slate-900">
+                  {formatNumber(CURRENT_BALANCE)}
+                </span>
+                <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" />
+                  מצב מצוין
+                </span>
+              </div>
+              <p className="text-sm text-gray-400 mt-4">
+                היתרה מספיקה לכ-3 שבועות של פעילות.
+              </p>
+            </div>
+            <div className="bg-emerald-100 p-4 rounded-full opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+            </div>
+          </div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-gray-50 rounded-full opacity-50 z-0 pointer-events-none"></div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center text-center hover:shadow-md transition-shadow duration-300">
+          <div className="bg-blue-50 p-3 rounded-full mb-3">
+            <TrendingUp className="w-6 h-6 text-blue-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900">צריכה חודשית</h3>
+          <p className="text-3xl font-bold text-slate-700 mt-1">2,450</p>
+          <p className="text-xs text-gray-400 mt-1">משלוחים ב-30 ימים אחרונים</p>
+        </div>
+      </section>
+
+      {/* PURCHASE ZONE */}
+      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="flex items-center gap-3 mb-8 border-b border-gray-100 pb-4">
+          <div className="bg-indigo-100 p-2 rounded-lg">
+            <ShoppingCart className="w-5 h-5 text-indigo-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">רכישת חבילת משלוחים</h2>
+            <p className="text-sm text-gray-500">בחר את כמות המשלוחים הרצויה באמצעות הסרגל או הכפתורים</p>
+          </div>
+        </div>
+
+        <div className="py-8 px-4 bg-slate-50 rounded-xl border border-slate-100 mb-8">
+          <div className="flex justify-center items-center gap-6 mb-10">
+            <button 
+              onClick={() => adjustAmount(-100)}
+              className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-md active:scale-95 transition-all"
+            >
+              <Minus className="w-5 h-5" />
+            </button>
+            
+            <div className="flex flex-col items-center w-64">
+              <input 
+                type="number" 
+                value={purchaseAmount}
+                onChange={(e) => {
+                  const val = Math.min(Math.max(Number(e.target.value), MIN_AMOUNT), MAX_AMOUNT);
+                  setPurchaseAmount(val);
+                }}
+                className="text-center font-extrabold text-5xl text-slate-800 bg-transparent outline-none w-full p-0 tracking-tight"
+              />
+              <span className="text-gray-400 font-medium text-sm mt-2 tracking-wide uppercase">משלוחים להזמנה</span>
+            </div>
+
+            <button 
+              onClick={() => adjustAmount(100)}
+              className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-md active:scale-95 transition-all"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="relative h-10 flex items-center px-4">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value={getSliderValue(purchaseAmount)}
+              onChange={handleSliderChange}
+              className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-10 relative"
+            />
+          </div>
+          
+          <div className="flex justify-between text-xs font-medium text-gray-400 px-1 mt-1 font-mono">
+            <span>100</span>
+            <span>1,000</span>
+            <span>10,000</span>
+            <span>100K</span>
+            <span>300K</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          {[1000, 5000, 20000, 50000].map((amount) => (
+            <button
+              key={amount}
+              onClick={() => setPurchaseAmount(amount)}
+              className={`py-3 px-3 rounded-xl text-sm font-medium transition-all border ${
+                purchaseAmount === amount 
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
+                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+              }`}
+            >
+              +{formatNumber(amount)}
+            </button>
+          ))}
+        </div>
+
+        <div className="bg-slate-900 rounded-xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
+          <div className="space-y-1 text-center sm:text-right w-full sm:w-auto">
+            <div className="flex justify-between sm:justify-start gap-4 text-sm text-gray-400">
+              <span>מחיר ליחידה:</span>
+              <span className="font-medium text-white">{formatCurrency(pricePerUnit)}</span>
+            </div>
+            <div className="flex justify-between sm:justify-start gap-4 items-baseline">
+              <span className="text-gray-300 font-medium">סה"כ לתשלום:</span>
+              <span className="text-3xl font-bold">{formatCurrency(totalPrice)}</span>
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              * המחיר כולל מע"מ
+            </div>
+          </div>
+
+          <button 
+            onClick={() => onCheckout({ amount: purchaseAmount, price: totalPrice })}
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg group"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            <CreditCard className={`w-5 h-5 transition-transform ${isHovering ? 'rotate-12' : ''}`} />
+            בצע תשלום
+            <ChevronLeft className={`w-4 h-4 transition-transform ${isHovering ? '-translate-x-1' : ''}`} />
+          </button>
+        </div>
+      </section>
+      
+      {/* PCI FOOTER */}
+      <div className="flex justify-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all pb-8">
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <div className="w-8 h-5 bg-gray-200 rounded"></div>
+            <div className="w-8 h-5 bg-gray-200 rounded"></div>
+            <div className="w-8 h-5 bg-gray-200 rounded"></div>
+            <span className="flex items-center gap-1"><Lock className="w-3 h-3"/> תשלום מאובטח בתקן PCI</span>
+          </div>
+      </div>
+    </div>
+  );
+};
+
+// 2. CHECKOUT & SETTINGS PAGE
+const CheckoutPage = ({ orderData, onBack }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePayment = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      alert('תשלום בוצע בהצלחה! (סימולציה)');
+    }, 2000);
+  };
+
+  const formatCurrency = (val) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(val);
+  const formatNumber = (val) => new Intl.NumberFormat('he-IL').format(val);
+
+  return (
+    <div className="space-y-6 animate-in slide-in-from-right duration-500">
+      
+      {/* Back Button */}
+      <button 
+        onClick={onBack}
+        className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors font-medium mb-4"
+      >
+        <ArrowRight className="w-4 h-4" />
+        חזרה לבחירת חבילה
+      </button>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* RIGHT COLUMN: Forms */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
+             <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+             <div>
+               <h4 className="font-bold text-blue-900 text-sm">השלמת רכישה מאובטחת</h4>
+               <p className="text-xs text-blue-700 mt-1">אנא וודא את פרטי החשבונית ומלא את פרטי האשראי.</p>
+             </div>
+          </div>
+
+          {/* Form 1: Business Details */}
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+              <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-slate-800">פרטי העסק לחשבונית</h3>
+            </div>
+            
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">שם העסק</label>
+                <input type="text" defaultValue="[שם העסק]" className="input-field" />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">ח.פ / עוסק מורשה</label>
+                <div className="relative">
+                  <input type="text" defaultValue="314917972" className="input-field font-mono" />
+                  <ShieldCheck className="absolute left-3 top-3 w-5 h-5 text-emerald-500" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Form 2: Contact Info (No Address) */}
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+             <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+              <div className="bg-orange-100 p-2 rounded-lg text-orange-600">
+                <User className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-slate-800">פרטי איש קשר</h3>
+            </div>
+            
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">שם מלא</label>
+                <input type="text" defaultValue="אלכס" className="input-field" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">מייל לחשבונית</label>
+                <input type="email" defaultValue="alex@business.co.il" className="input-field dir-ltr text-right" />
+              </div>
+            </div>
+          </section>
+
+          {/* Form 3: CREDIT CARD DETAILS */}
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600">
+                  <CreditCardIcon className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-slate-800">פרטי אשראי</h3>
+              </div>
+              <div className="flex gap-2 opacity-50">
+                 {/* Simple CSS placeholders for card logos */}
+                 <div className="w-8 h-5 bg-gray-300 rounded"></div>
+                 <div className="w-8 h-5 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-semibold text-gray-700">מספר כרטיס</label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="0000 0000 0000 0000" 
+                    className="input-field font-mono text-lg tracking-wider pl-10 dir-ltr" 
+                  />
+                  <CreditCard className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">תוקף (MM/YY)</label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="MM/YY" 
+                    className="input-field font-mono text-center tracking-widest pl-10 dir-ltr" 
+                  />
+                  <Calendar className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">קוד בגב הכרטיס (CVV)</label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="123" 
+                    className="input-field font-mono text-center tracking-widest pl-10 dir-ltr" 
+                    maxLength={3}
+                  />
+                  <Lock className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-semibold text-gray-700">ת.ז. בעל הכרטיס</label>
+                <input type="text" placeholder="הקלד מספר תעודת זהות" className="input-field" />
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* LEFT COLUMN: Order Summary & Payment */}
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
+            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-gray-400" />
+              סיכום הזמנה
+            </h3>
+            
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                <span className="text-gray-600">חבילת משלוחים</span>
+                <span className="font-bold text-slate-800">{formatNumber(orderData.amount)} יח'</span>
+              </div>
+              <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                <span className="text-gray-600">מחיר ליחידה</span>
+                <span className="font-medium text-slate-800">{(orderData.price / orderData.amount).toFixed(2)} ₪</span>
+              </div>
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-lg font-bold text-slate-900">סה"כ לתשלום</span>
+                <span className="text-2xl font-extrabold text-blue-600">{formatCurrency(orderData.price)}</span>
+              </div>
+              <p className="text-xs text-center text-gray-400">המחיר כולל מע"מ</p>
+            </div>
+
+            <button 
+              onClick={handlePayment}
+              disabled={isLoading}
+              className="w-full bg-slate-900 hover:bg-emerald-600 text-white py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 font-bold text-lg disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  מעבד תשלום...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-5 h-5" />
+                  אישור ותשלום
+                </>
+              )}
+            </button>
+
+            <div className="mt-6 text-center">
+              <p className="text-xs text-gray-400 mb-2">אנו מכבדים את כל סוגי הכרטיסים</p>
+              <div className="flex justify-center gap-2 opacity-50">
+                 <div className="w-8 h-5 bg-gray-200 rounded"></div>
+                 <div className="w-8 h-5 bg-gray-200 rounded"></div>
+                 <div className="w-8 h-5 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* CSS Helper for Inputs */}
+      <style>{`
+        .input-field {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 0.75rem;
+          border: 1px solid #e2e8f0;
+          background-color: #f8fafc;
+          transition: all 0.2s;
+          outline: none;
+        }
+        .input-field:focus {
+          background-color: white;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 2px #dbeafe;
+        }
+        .dir-ltr {
+          direction: ltr;
+        }
+        .radio-card {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem;
+          border: 1px solid #bfdbfe;
+          background-color: #eff6ff;
+          border-radius: 0.75rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .radio-card-plain {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.75rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .radio-card-plain:hover {
+          background-color: #f8fafc;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// 3. MAIN APP (Navigation Handler)
+const ShipmentApp = () => {
+  const [currentView, setCurrentView] = useState('hub'); // 'hub' or 'checkout'
+  const [checkoutData, setCheckoutData] = useState(null);
+
+  const handleGoToCheckout = (data) => {
+    setCheckoutData(data);
+    setCurrentView('checkout');
+    window.scrollTo(0, 0);
+  };
+
+  const handleBackToHub = () => {
+    setCurrentView('hub');
+    window.scrollTo(0, 0);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-slate-800 font-sans" dir="rtl">
+      {/* Top Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="bg-blue-600 p-2 rounded-lg">
+              <Package className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-slate-900">
+              ניהול משלוחים – <span className="text-blue-600">[שם העסק]</span>
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex flex-col items-end">
+               <span className="text-sm font-medium text-slate-700">אלכס</span>
+               <span className="text-xs text-gray-500">[שם העסק]</span>
+            </div>
+            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm border border-blue-200">
+              א
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {currentView === 'hub' ? (
+          <ShipmentHub onCheckout={handleGoToCheckout} />
+        ) : (
+          <CheckoutPage orderData={checkoutData} onBack={handleBackToHub} />
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default ShipmentApp;
