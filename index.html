@@ -163,44 +163,44 @@
 
         const Dashboard = () => {
             return (
-                <div className="p-8 space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
+                <div className="p-4 md:p-8 space-y-6 md:space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">לוח בקרה ראשי</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">לוח בקרה ראשי</h1>
                         <p className="text-gray-500 dark:text-slate-400 text-sm">סקירה כללית בזמן אמת</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-blue-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+                        <div className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-2xl border border-blue-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
                             <div className="absolute right-0 top-0 w-1 h-full bg-blue-500"></div>
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col md:flex-row justify-between items-start">
                                 <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">פעילים</span>
-                                <div className="p-2 bg-blue-50 dark:bg-slate-700 rounded-lg text-blue-600 dark:text-blue-400"><Icons.Package className="w-5 h-5"/></div>
+                                <div className="p-1.5 md:p-2 bg-blue-50 dark:bg-slate-700 rounded-lg text-blue-600 dark:text-blue-400"><Icons.Package className="w-4 h-4 md:w-5 md:h-5"/></div>
                             </div>
-                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">42</div>
+                            <div className="text-2xl md:text-4xl font-extrabold text-slate-800 dark:text-white mt-2 md:mt-0">42</div>
                         </div>
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-orange-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                        <div className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-2xl border border-orange-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
                             <div className="absolute right-0 top-0 w-1 h-full bg-orange-500"></div>
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col md:flex-row justify-between items-start">
                                 <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">ממתינים</span>
-                                <div className="p-2 bg-orange-50 dark:bg-slate-700 rounded-lg text-orange-600 dark:text-orange-400"><Icons.Clock className="w-5 h-5"/></div>
+                                <div className="p-1.5 md:p-2 bg-orange-50 dark:bg-slate-700 rounded-lg text-orange-600 dark:text-orange-400"><Icons.Clock className="w-4 h-4 md:w-5 md:h-5"/></div>
                             </div>
-                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">15</div>
+                            <div className="text-2xl md:text-4xl font-extrabold text-slate-800 dark:text-white mt-2 md:mt-0">15</div>
                         </div>
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-purple-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                        <div className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-2xl border border-purple-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
                             <div className="absolute right-0 top-0 w-1 h-full bg-purple-500"></div>
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col md:flex-row justify-between items-start">
                                 <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">שובץ</span>
-                                <div className="p-2 bg-purple-50 dark:bg-slate-700 rounded-lg text-purple-600 dark:text-purple-400"><Icons.User className="w-5 h-5"/></div>
+                                <div className="p-1.5 md:p-2 bg-purple-50 dark:bg-slate-700 rounded-lg text-purple-600 dark:text-purple-400"><Icons.User className="w-4 h-4 md:w-5 md:h-5"/></div>
                             </div>
-                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">8</div>
+                            <div className="text-2xl md:text-4xl font-extrabold text-slate-800 dark:text-white mt-2 md:mt-0">8</div>
                         </div>
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-indigo-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                        <div className="bg-white dark:bg-slate-800 p-4 md:p-6 rounded-2xl border border-indigo-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
                             <div className="absolute right-0 top-0 w-1 h-full bg-indigo-500"></div>
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col md:flex-row justify-between items-start">
                                 <span className="text-gray-500 dark:text-slate-400 font-medium text-sm">נאסף</span>
-                                <div className="p-2 bg-indigo-50 dark:bg-slate-700 rounded-lg text-indigo-600 dark:text-indigo-400"><Icons.Truck className="w-5 h-5"/></div>
+                                <div className="p-1.5 md:p-2 bg-indigo-50 dark:bg-slate-700 rounded-lg text-indigo-600 dark:text-indigo-400"><Icons.Truck className="w-4 h-4 md:w-5 md:h-5"/></div>
                             </div>
-                            <div className="text-4xl font-extrabold text-slate-800 dark:text-white">19</div>
+                            <div className="text-2xl md:text-4xl font-extrabold text-slate-800 dark:text-white mt-2 md:mt-0">19</div>
                         </div>
                     </div>
 
@@ -331,8 +331,7 @@
                 <div className="space-y-8 animate-in fade-in duration-500 p-8 max-w-5xl mx-auto">
                     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="md:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-0 relative overflow-hidden group hover:shadow-md transition-shadow duration-300 flex flex-col">
-                            <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
-                            
+                           
                             <div className="p-4 flex justify-between items-center relative z-10 flex-1">
                                 <div>
                                     <h2 className="text-gray-500 dark:text-slate-400 text-sm font-medium flex items-center gap-2 mb-1">
@@ -745,7 +744,15 @@
 
             return (
                 <div className="space-y-6 animate-in slide-in-from-right duration-500 p-8 max-w-7xl mx-auto">
-                    <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors font-medium mb-4"><Icons.ArrowRight className="w-4 h-4" /> חזרה לכספים</button>
+                    {/* Back Button */}
+                    <button 
+                        onClick={onBack}
+                        className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors font-medium mb-4"
+                    >
+                        <Icons.ArrowRight className="w-4 h-4" />
+                        חזרה לכספים
+                    </button>
+
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"><div className="flex items-center gap-3"><div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Icons.FileText className="w-5 h-5" /></div><div><h3 className="font-bold text-slate-800 text-lg">היסטוריית רכישות</h3><p className="text-sm text-gray-500">צפייה והורדה של חשבוניות מס עבור רכישות יתרה</p></div></div></div>
                         <div className="overflow-x-auto"><table className="w-full text-right"><thead className="bg-gray-50 text-gray-500 text-sm font-semibold uppercase tracking-wider"><tr><th className="px-6 py-4">תאריך</th><th className="px-6 py-4">מספר חשבונית</th><th className="px-6 py-4">תיאור</th><th className="px-6 py-4">סכום</th><th className="px-6 py-4">סטטוס</th><th className="px-6 py-4">פעולות</th></tr></thead><tbody className="divide-y divide-gray-100 text-sm text-slate-700">{invoices.map((inv) => (<tr key={inv.id} className="hover:bg-slate-50 transition-colors"><td className="px-6 py-4 font-medium">{inv.date}</td><td className="px-6 py-4 font-mono text-gray-500">{inv.number}</td><td className="px-6 py-4">{inv.desc}</td><td className="px-6 py-4 font-bold">{formatCurrency(inv.amount)}</td><td className="px-6 py-4"><span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-semibold">{inv.status}</span></td><td className="px-6 py-4"><button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-all font-medium"><Icons.Download className="w-4 h-4" />הורד</button></td></tr>))}</tbody></table></div>
